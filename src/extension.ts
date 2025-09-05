@@ -6,7 +6,12 @@ export function activate(context: vscode.ExtensionContext) {
 	const changeDisposable = vscode.workspace.onDidChangeTextDocument(() => resetTimer());
 	context.subscriptions.push(changeDisposable);
 
-	let targets = 10; // can be modified
+	// game state
+	let targetGoals = 10; // can be modified
+	let targetSpeed;
+	let targetSize;
+	let targetTimeExists;
+
 	let gameActive = false;
 	let gamePanel: vscode.WebviewPanel | undefined;
 	let openTabsDisposable: vscode.Disposable | undefined;
@@ -96,7 +101,7 @@ export function activate(context: vscode.ExtensionContext) {
 			}
 		});
 
-		gamePanel.webview.html = getGameHTML(targets, { fontFamily });
+		gamePanel.webview.html = getGameHTML(targetGoals, { fontFamily });
 
 		// Handle messages from webview
 		gamePanel.webview.onDidReceiveMessage(
