@@ -136,6 +136,40 @@ export function getGameHTML(opts?: {
         import * as THREE from 'https://unpkg.com/three@0.152.2/build/three.module.js';
         const vscode = acquireVsCodeApi();
 
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        const audioCtx = new (AudioContext)();
+        function playHitSound() {
+            const now = audioCtx.currentTime;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(800, now);
+            osc.frequency.exponentialRampToValueAtTime(220, now + 0.18);
+            gain.gain.setValueAtTime(0.0001, now);
+            gain.gain.exponentialRampToValueAtTime(0.20, now + 0.01);
+            gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.22);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start(now);
+            osc.stop(now + 0.25);
+        }
+
+        function playMissSound() {
+            const now = audioCtx.currentTime;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(260, now);
+            osc.frequency.exponentialRampToValueAtTime(120, now + 0.14);
+            gain.gain.setValueAtTime(0.0001, now);
+            gain.gain.linearRampToValueAtTime(0.18, now + 0.02);
+            gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.18);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start(now);
+            osc.stop(now + 0.20);
+        }
+
         let score = 0;
         let shots = 0;
         let streak = 0;
@@ -282,6 +316,7 @@ export function getGameHTML(opts?: {
 
         function onPointerDown(e) {
             shots++;
+            if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
             mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
             mouse.y = - (e.clientY / window.innerHeight) * 2 + 1;
             raycaster.setFromCamera(mouse, camera);
@@ -295,6 +330,7 @@ export function getGameHTML(opts?: {
                 streak++;
                 scoreElement.textContent = score;
                 spawnHitEffect(e.clientX, e.clientY, points);
+                playHitSound();
                 let explosionPos = null;
                 if (intersects.length > 0) {
                     const hit = intersects.find(i => {
@@ -320,6 +356,7 @@ export function getGameHTML(opts?: {
         }
 
         function spawnHitEffect(clientX, clientY, points) {
+            try { playHitSound(); } catch (e) {}
             const hitEffect = document.createElement('div');
             hitEffect.className = 'hit-effect';
             hitEffect.textContent = '+' + points;
@@ -330,6 +367,7 @@ export function getGameHTML(opts?: {
         }
 
         function spawnMissEffect(clientX, clientY) {
+            try { if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume(); playMissSound(); } catch (e) {}
             const missEffect = document.createElement('div');
             missEffect.className = 'miss-effect';
             missEffect.textContent = 'MISS';
