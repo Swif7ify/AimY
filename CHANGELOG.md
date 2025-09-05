@@ -15,7 +15,7 @@ All notable changes to AimY will be documented in this file.
 -   Complete workspace restoration after games
 -   Comprehensive settings configuration
 
-## [0.0.3] - 2025-01-05
+## [0.0.4] - 2025-01-05
 
 ### Added
 
