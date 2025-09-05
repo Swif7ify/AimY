@@ -57,6 +57,20 @@
 					"type": "number",
 					"default": 3000,
 					"description": "How long (ms) a target exists before counting as a miss. Set 0 to disable."
+				},
+				"aimy.statsFormat": {
+					"type": "string",
+					"enum": [
+						"json",
+						"csv"
+					],
+					"default": "json",
+					"description": "Format to save stats: 'json' = one file per run, 'csv' = append rows to aimy-stats.csv."
+				},
+				"aimy.statsDirectory": {
+					"type": "string",
+					"default": "",
+					"description": "Directory where AimY saves stats JSON files. Leave empty to use the extension storage folder."
 				}
 			}
 		}

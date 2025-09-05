@@ -1,5 +1,6 @@
 import * as vscode from "vscode";
 import { getGameHTML } from "./gameHtml";
+import { saveGameStats } from "./saveGameStats";
 
 export function activate(context: vscode.ExtensionContext) {
 	// game state
@@ -170,24 +171,36 @@ export function activate(context: vscode.ExtensionContext) {
 
 		// Handle messages from webview
 		gamePanel.webview.onDidReceiveMessage(
-			(message) => {
-				switch (message.command) {
-					case "gameComplete":
-						suppressReopen = true;
-						endGame();
-						vscode.window.withProgress(
-							{
-								location: vscode.ProgressLocation.Notification,
-								title: "Game Complete! Restoring your workspace...",
-								cancellable: false,
-							},
-							async () => {
-								await new Promise((res) => setTimeout(res, 3000));
-							}
-						);
+			async (message) => {
+				if (!message || !message.command) {
+					return;
+				}
+				if (message.command === "gameComplete") {
+					try {
+						await saveGameStats(context, {
+							score: message.score,
+							time: message.time,
+							accuracy: message.accuracy,
+							bestStreak: message.bestStreak,
+							timestamp: new Date().toISOString(),
+						});
+					} catch (err) {
+						console.error("Failed saving stats:", err);
+					}
 
-						suppressReopen = false;
-						return;
+					suppressReopen = true;
+					endGame();
+					await vscode.window.withProgress(
+						{
+							location: vscode.ProgressLocation.Notification,
+							title: "Game Complete! Restoring your workspace...",
+							cancellable: false,
+						},
+						async () => {
+							await new Promise((res) => setTimeout(res, 3000));
+						}
+					);
+					suppressReopen = false;
 				}
 			},
 			undefined,
