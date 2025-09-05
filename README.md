@@ -78,7 +78,7 @@ The side benefit of improved mouse precision is just a bonus!
 
 ## Contributing
 
-Found a bug or have a feature idea? Check out the [GitHub repository](https://github.com/Swif7ify/AimY) and feel free to open an issue or submit a pull request.
+Found a bug or have a feature idea? Check out the [GitHub repository](https://github.com/Swif7ify/AimY/issues) and feel free to open an issue or submit a pull request.
 
 ## License
 
