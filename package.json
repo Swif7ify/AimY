@@ -2,7 +2,7 @@
 	"name": "aimy",
 	"displayName": "AimY",
 	"description": "Stop Coding, Start Shooting",
-	"version": "0.0.3",
+	"version": "0.0.4",
 	"engines": {
 		"vscode": "^1.103.0"
 	},
@@ -94,7 +94,6 @@
 					"default": true,
 					"description": "Enable visual effects like particles and hit/miss animations."
 				}
-				
 			}
 		}
 	},
