@@ -94,7 +94,7 @@
 		"@vscode/test-cli": "^0.0.11",
 		"@vscode/test-electron": "^2.5.2"
 	},
-	"publisher": "your-publisher-id",
+	"publisher": "EarlRomeoOrdovez",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/Swif7ify/AimY"
@@ -103,5 +103,5 @@
 		"url": "https://github.com/Swif7ify/AimY/issues"
 	},
 	"license": "MIT",
-	"icon": "images/icon.png"
+	"icon": "public/icon.png"
 }

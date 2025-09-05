@@ -1,71 +1,89 @@
-# aimy README
+# AimY 🎯
 
-This is the README for your extension "aimy". After writing up a brief description, we recommend including the following sections.
+**Keep Coding, Stop Typing, Start Shooting!**
+
+AimY is a VS Code extension that turns your idle time into aim training sessions. When you stop coding for a while, targets appear and you need to hit them to get back to work. It's like having a built-in break reminder that actually improves your mouse precision.
+
+## What It Does
+
+-   Detects when you're idle (configurable timer)
+-   Launches a fullscreen target practice game
+-   Blocks access to your code until you complete the challenge
+-   Tracks your performance over time
+-   Restores your workspace exactly as it was
 
 ## Features
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+### 🎮 Automatic Game Trigger
 
-For example if there is an image subfolder under your extension project workspace:
+Takes over VS Code when you've been idle, forcing you to take an active break before continuing to code.
 
-\!\[feature X\]\(images/feature-x.png\)
+### ⚙️ Fully Customizable
 
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
+-   Adjust idle timeout (default: 1 minute)
+-   Set number of targets to hit (default: 5)
+-   Configure target size and behavior
+-   Choose between JSON or CSV stat tracking
 
-## Requirements
+### 📊 Performance Tracking
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+Every game session is saved with detailed stats including accuracy, completion time, and your best streak.
 
-## Extension Settings
+### 🎯 Precision Training
 
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
+Moving targets, timed challenges, and accuracy scoring help improve your mouse control over time.
 
-For example:
+## Installation
 
-This extension contributes the following settings:
+1. Install from the VS Code Marketplace
+2. Restart VS Code
+3. The extension activates automatically
+4. Start coding and wait for your first challenge!
 
-* `myExtension.enable`: Enable/disable this extension.
-* `myExtension.thing`: Set to `blah` to do something.
+## Quick Start
 
-## Known Issues
+The extension works out of the box with sensible defaults. You can also:
 
-Calling out known issues can help limit users opening duplicate issues against your extension.
+-   Use `Ctrl+Shift+P` → "AimY: Start Game" to play manually
+-   Click the status bar indicator to toggle auto-start on/off
+-   Configure settings via File → Preferences → Settings → search "AimY"
 
-## Release Notes
+## Configuration
 
-Users appreciate release notes as you update your extension.
+All settings are available in VS Code settings under the "AimY" section:
 
-### 1.0.0
+| Setting                | Default  | Description                                  |
+| ---------------------- | -------- | -------------------------------------------- |
+| `aimy.enableExtension` | `true`   | Enable/disable automatic game triggering     |
+| `aimy.idleTimer`       | `60000`  | Idle time in milliseconds before game starts |
+| `aimy.targetGoals`     | `5`      | Number of targets to hit per game            |
+| `aimy.targetSize`      | `100`    | Target diameter in pixels                    |
+| `aimy.targetMove`      | `false`  | Enable moving targets for extra challenge    |
+| `aimy.targetSpeed`     | `3000`   | Target movement/spawn speed                  |
+| `aimy.statsFormat`     | `"json"` | Save format: "json" or "csv"                 |
 
-Initial release of ...
+## Why AimY?
 
-### 1.0.1
+I built this because I noticed I'd often get stuck in long coding sessions without proper breaks. Traditional break reminders were easy to ignore, but having to actually complete a quick aim challenge before getting back to work ensures you take that mental reset.
 
-Fixed issue #.
+The side benefit of improved mouse precision is just a bonus!
 
-### 1.1.0
+## Stats & Privacy
 
-Added features X, Y, and Z.
+-   All stats are saved locally on your machine
+-   No data is sent anywhere
+-   You can configure where stats are saved
+-   JSON format creates one file per session
+-   CSV format appends to a single file for easy analysis
+
+## Contributing
+
+Found a bug or have a feature idea? Check out the [GitHub repository](https://github.com/Swif7ify/AimY) and feel free to open an issue or submit a pull request.
+
+## License
+
+MIT - see the LICENSE file for details.
 
 ---
 
-## Following extension guidelines
-
-Ensure that you've read through the extensions guidelines and follow the best practices for creating your extension.
-
-* [Extension Guidelines](https://code.visualstudio.com/api/references/extension-guidelines)
-
-## Working with Markdown
-
-You can author your README using Visual Studio Code. Here are some useful editor keyboard shortcuts:
-
-* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux).
-* Toggle preview (`Shift+Cmd+V` on macOS or `Shift+Ctrl+V` on Windows and Linux).
-* Press `Ctrl+Space` (Windows, Linux, macOS) to see a list of Markdown snippets.
-
-## For more information
-
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
-
-**Enjoy!**
+_Happy aiming! 🎯_
