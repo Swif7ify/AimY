@@ -1,17 +1,24 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from "vscode";
+import { getGameHTML } from "./gameHtml";
 
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
 	// Use the console to output diagnostic information (console.log) and errors (console.error)
 	// This line of code will only be executed once when your extension is activated
-	vscode.window.showInformationMessage("Window Has Started"); // DEBUGGING
-
-	let idleTimer: NodeJS.Timeout | undefined;
+	let idleTimer: NodeJS.Timeout | undefined; // can be modified
 	const changeDisposable = vscode.workspace.onDidChangeTextDocument(() => resetTimer());
 	context.subscriptions.push(changeDisposable);
+
+	// state
+	let targets = 10; // can be modified
+	let gameActive = false;
+	let gamePanel: vscode.WebviewPanel | undefined;
+	let openTabsDisposable: vscode.Disposable | undefined;
+	let savedTabs: vscode.Tab[] = [];
+	let suppressReopen = false; // when true, don't auto-reopen if panel is disposed
 
 	function resetTimer() {
 		if (idleTimer) {
@@ -19,7 +26,17 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 
 		idleTimer = setTimeout(() => {
-			vscode.window.showInformationMessage("You've been idle for 5 seconds! Game is starting...");
+			vscode.window.withProgress(
+				{
+					location: vscode.ProgressLocation.Notification,
+					title: "You have been idle for 5 seconds! Game is starting...",
+					cancellable: false,
+				},
+				async () => {
+					// keep notification visible for 3 seconds
+					await new Promise((res) => setTimeout(res, 3000));
+				}
+			);
 			showGame();
 		}, 5 * 1000); // 5 seconds
 	}
@@ -27,65 +44,106 @@ export function activate(context: vscode.ExtensionContext) {
 	resetTimer();
 
 	function showGame() {
-		const panel = vscode.window.createWebviewPanel("aimTrainer", "AimY", vscode.ViewColumn.One, {
+		if (gameActive) {
+			return;
+		}
+
+		gameActive = true;
+
+		// Save currently open tabs
+		savedTabs = vscode.window.tabGroups.all.flatMap((group) => group.tabs);
+
+		// Close all tabs
+		vscode.commands.executeCommand("workbench.action.closeAllEditors");
+
+		// Create fullscreen game webview
+		gamePanel = vscode.window.createWebviewPanel("aimyGame", "AimY - Hit the Targets!", vscode.ViewColumn.One, {
 			enableScripts: true,
+			retainContextWhenHidden: true,
 		});
 
-		panel.webview.html = getGameHtml();
+		// Prevent new tabs from opening while game is active
+		openTabsDisposable = vscode.window.onDidChangeActiveTextEditor(() => {
+			if (gameActive && vscode.window.activeTextEditor) {
+				vscode.commands.executeCommand("workbench.action.closeActiveEditor");
+				vscode.window.withProgress(
+					{
+						location: vscode.ProgressLocation.Notification,
+						title: "Complete the game to unlock editing!",
+						cancellable: false,
+					},
+					async () => {
+						await new Promise((res) => setTimeout(res, 3000));
+					}
+				);
+			}
+		});
+
+		gamePanel.webview.html = getGameHTML(targets);
+
+		// Handle messages from webview
+		gamePanel.webview.onDidReceiveMessage(
+			(message) => {
+				switch (message.command) {
+					case "gameComplete":
+						endGame();
+						vscode.window.withProgress(
+							{
+								location: vscode.ProgressLocation.Notification,
+								title: "Game Complete! Restoring your workspace...",
+								cancellable: false,
+							},
+							async () => {
+								await new Promise((res) => setTimeout(res, 3000));
+							}
+						);
+						return;
+				}
+			},
+			undefined,
+			context.subscriptions
+		);
 	}
 
-	function getGameHtml(): string {
-		return `
-      <!DOCTYPE html>
-      <html>
-      <body style="display:flex;justify-content:center;align-items:center;height:100vh;background:#111;color:white;margin:0;">
-        <canvas id="gameCanvas" width="600" height="400" style="background:#222;border:2px solid white;"></canvas>
-        <p id="score" style="position:absolute;top:10px;left:10px;color:white;font-family:sans-serif;">Score: 0</p>
-        <script>
-          const canvas = document.getElementById('gameCanvas');
-          const ctx = canvas.getContext('2d');
-          const scoreText = document.getElementById('score');
-          let score = 0;
+	function endGame() {
+		gameActive = false;
 
-          function spawnTarget() {
-            const x = Math.random() * (canvas.width - 50) + 25;
-            const y = Math.random() * (canvas.height - 50) + 25;
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.beginPath();
-            ctx.arc(x, y, 25, 0, Math.PI * 2);
-            ctx.fillStyle = "red";
-            ctx.fill();
+		if (openTabsDisposable) {
+			openTabsDisposable.dispose();
+			openTabsDisposable = undefined;
+		}
 
-            // save target position
-            return {x, y, r: 25};
-          }
+		if (gamePanel) {
+			gamePanel.dispose();
+			gamePanel = undefined;
+		}
 
-          let currentTarget = spawnTarget();
-
-          canvas.addEventListener('click', e => {
-            const rect = canvas.getBoundingClientRect();
-            const clickX = e.clientX - rect.left;
-            const clickY = e.clientY - rect.top;
-
-            const dx = clickX - currentTarget.x;
-            const dy = clickY - currentTarget.y;
-            if (Math.sqrt(dx*dx + dy*dy) <= currentTarget.r) {
-              score++;
-              scoreText.textContent = "Score: " + score;
-              currentTarget = spawnTarget();
-            }
-          });
-        </script>
-      </body>
-      </html>
-    `;
+		// Restore previously open tabs
+		setTimeout(() => {
+			savedTabs.forEach((tab) => {
+				if (tab.input && typeof tab.input === "object" && tab.input !== null && (tab.input as any).uri) {
+					vscode.window.showTextDocument((tab.input as any).uri, { preview: false });
+				}
+			});
+			savedTabs = [];
+		}, 500);
 	}
 
 	// The command has been defined in the package.json file
 	// Now provide the implementation of the command with registerCommand
 	// The commandId parameter must match the command field in package.json
 	const disposable = vscode.commands.registerCommand("aimy.startGame", () => {
-		vscode.window.showInformationMessage("Manually Started, Game is starting...");
+		vscode.window.withProgress(
+			{
+				location: vscode.ProgressLocation.Notification,
+				title: "Game Manually Started! Game is starting...",
+				cancellable: false,
+			},
+			async () => {
+				// keep notification visible for 3 seconds
+				await new Promise((res) => setTimeout(res, 3000));
+			}
+		);
 		showGame();
 	});
 
