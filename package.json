@@ -2,7 +2,7 @@
 	"name": "aimy",
 	"displayName": "AimY",
 	"description": "Stop Coding, Start Shooting",
-	"version": "0.0.1",
+	"version": "0.0.2",
 	"engines": {
 		"vscode": "^1.103.0"
 	},
