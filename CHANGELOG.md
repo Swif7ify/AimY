@@ -15,6 +15,21 @@ All notable changes to AimY will be documented in this file.
 -   Complete workspace restoration after games
 -   Comprehensive settings configuration
 
+## [0.0.3] - 2025-01-05
+
+### Added
+
+-   Configurable sound effects and master volume (`aimy.enableSoundEffects`, `aimy.soundVolume`)
+-   Optional background music/synth in the webview (toggleable)
+-   Visual effects toggle (`aimy.enableEffects`) to disable particles, +points and MISS UI
+-   Stats saving improvements:
+    -   Support for JSON and CSV (`aimy.statsFormat`)
+    -   Configurable stats output directory (`aimy.statsDirectory`)
+    -   Saved stats now include the game settings used for the run
+-   New command registrations and activation events (`aimy.startGame`, `aimy.toggle`)
+-   "Reset to defaults" setting implemented (`aimy.resetDefaultSettings`)
+-   README and packaging metadata updates (publisher, repository, icon)
+
 ### Features
 
 -   🎯 Interactive target shooting game
