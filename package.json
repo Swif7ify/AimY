@@ -71,7 +71,30 @@
 					"type": "string",
 					"default": "",
 					"description": "Directory where AimY saves stats JSON files. Leave empty to use the extension storage folder."
+				},
+				"aimy.enableSoundEffects": {
+					"type": "boolean",
+					"default": true,
+					"description": "Enable/disable hit/miss sound effects in the game."
+				},
+				"aimy.soundVolume": {
+					"type": "number",
+					"default": 80,
+					"minimum": 0,
+					"maximum": 100,
+					"description": "Volume for sound effects (0-100)."
+				},
+				"aimy.enableStatsSave": {
+					"type": "boolean",
+					"default": true,
+					"description": "Enable/disable saving game stats to files."
+				},
+				"aimy.enableEffects": {
+					"type": "boolean",
+					"default": true,
+					"description": "Enable visual effects like particles and hit/miss animations."
 				}
+				
 			}
 		}
 	},

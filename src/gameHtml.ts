@@ -5,6 +5,9 @@ export function getGameHTML(opts?: {
 	targetSpeed?: number;
 	targetSize?: number;
 	targetTimeExists?: number;
+	enableSoundEffects?: boolean;
+	soundVolume?: number;
+	enableEffects?: boolean;
 }): string {
 	const ff = (opts?.fontFamily || "Segoe UI").replace(/["`]/g, "");
 	const TARGET_GOALS = opts?.targetGoals ?? 5;
@@ -12,6 +15,9 @@ export function getGameHTML(opts?: {
 	const DEFAULT_MOVE = opts?.targetMove ?? false;
 	const DEFAULT_SPEED = opts?.targetSpeed ?? 3000;
 	const TIME_EXISTS = opts?.targetTimeExists ?? 3000;
+	const SOUND_EFFECTS = opts?.enableSoundEffects ?? true;
+	const SOUND_VOLUME = opts?.soundVolume ?? 80;
+	const ENABLE_EFFECTS = opts?.enableEffects ?? true;
 
 	return `<!DOCTYPE html>
 <html lang="en">
@@ -136,9 +142,32 @@ export function getGameHTML(opts?: {
         import * as THREE from 'https://unpkg.com/three@0.152.2/build/three.module.js';
         const vscode = acquireVsCodeApi();
 
-        const AudioContext = window.AudioContext || window.webkitAudioContext;
-        const audioCtx = new (AudioContext)();
+        const SOUND_EFFECTS = ${JSON.stringify(SOUND_EFFECTS)};
+        const SOUND_VOLUME = ${Number(SOUND_VOLUME)};
+        const ENABLE_EFFECTS = ${JSON.stringify(ENABLE_EFFECTS)};
+
+        let audioCtx = null;
+        let masterGain = null;
+        if (SOUND_EFFECTS) {
+            try {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                masterGain = audioCtx.createGain();
+                masterGain.gain.value = Math.max(0, Math.min(1, SOUND_VOLUME/100));
+                masterGain.connect(audioCtx.destination);
+            } catch (e) {
+                audioCtx = null;
+                masterGain = null;
+            }
+        }
+
+        function ensureAudioResume() {
+            if (!audioCtx) return;
+            if (audioCtx.state === 'suspended') audioCtx.resume().catch(() => {});
+        }
+
         function playHitSound() {
+            if (!SOUND_EFFECTS || !audioCtx || !masterGain) return;
+            ensureAudioResume();
             const now = audioCtx.currentTime;
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
@@ -149,12 +178,14 @@ export function getGameHTML(opts?: {
             gain.gain.exponentialRampToValueAtTime(0.20, now + 0.01);
             gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.22);
             osc.connect(gain);
-            gain.connect(audioCtx.destination);
+            gain.connect(masterGain);
             osc.start(now);
             osc.stop(now + 0.25);
         }
 
         function playMissSound() {
+            if (!SOUND_EFFECTS || !audioCtx || !masterGain) return;
+            ensureAudioResume();
             const now = audioCtx.currentTime;
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
@@ -165,7 +196,7 @@ export function getGameHTML(opts?: {
             gain.gain.linearRampToValueAtTime(0.18, now + 0.02);
             gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.18);
             osc.connect(gain);
-            gain.connect(audioCtx.destination);
+            gain.connect(masterGain);
             osc.start(now);
             osc.stop(now + 0.20);
         }
@@ -185,6 +216,7 @@ export function getGameHTML(opts?: {
         const streakElement = document.getElementById('streak');
 
         function createParticles() {
+            if (!ENABLE_EFFECTS) return;
             const particlesContainer = document.getElementById('particles');
             for (let i = 0; i < 15; i++) {
                 setTimeout(() => {
@@ -199,8 +231,10 @@ export function getGameHTML(opts?: {
             }
         }
 
-        setInterval(createParticles, 3000);
-        createParticles();
+        if(ENABLE_EFFECTS) {
+            setInterval(createParticles, 3000);
+            createParticles();
+        }
 
         setInterval(() => {
             const elapsed = Math.floor((Date.now() - gameStartTime) / 1000);
@@ -316,7 +350,7 @@ export function getGameHTML(opts?: {
 
         function onPointerDown(e) {
             shots++;
-            if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+            if (SOUND_EFFECTS && audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
             mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
             mouse.y = - (e.clientY / window.innerHeight) * 2 + 1;
             raycaster.setFromCamera(mouse, camera);
@@ -329,8 +363,8 @@ export function getGameHTML(opts?: {
                 score += points;
                 streak++;
                 scoreElement.textContent = score;
-                spawnHitEffect(e.clientX, e.clientY, points);
-                playHitSound();
+                if (ENABLE_EFFECTS) spawnHitEffect(e.clientX, e.clientY, points);
+                if (SOUND_EFFECTS) playHitSound();
                 let explosionPos = null;
                 if (intersects.length > 0) {
                     const hit = intersects.find(i => {
@@ -356,7 +390,7 @@ export function getGameHTML(opts?: {
         }
 
         function spawnHitEffect(clientX, clientY, points) {
-            try { playHitSound(); } catch (e) {}
+            if (!ENABLE_EFFECTS) return;
             const hitEffect = document.createElement('div');
             hitEffect.className = 'hit-effect';
             hitEffect.textContent = '+' + points;
@@ -367,7 +401,14 @@ export function getGameHTML(opts?: {
         }
 
         function spawnMissEffect(clientX, clientY) {
-            try { if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume(); playMissSound(); } catch (e) {}
+            if (SOUND_EFFECTS && audioCtx) {
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume().then(() => { try { playMissSound(); } catch (e) {} }).catch(() => {});
+                } else {
+                    try { playMissSound(); } catch (e) {}
+                }
+            }
+            if (!ENABLE_EFFECTS) return;
             const missEffect = document.createElement('div');
             missEffect.className = 'miss-effect';
             missEffect.textContent = 'MISS';
@@ -385,6 +426,7 @@ export function getGameHTML(opts?: {
         }
 
         function createHitExplosion(position) {
+            if (!ENABLE_EFFECTS) return;
             const particleCount = 15;
             const particles = [];
             for (let i = 0; i < particleCount; i++) {

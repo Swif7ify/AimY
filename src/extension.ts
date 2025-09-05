@@ -6,7 +6,12 @@ export function activate(context: vscode.ExtensionContext) {
 	// game state
 	const cfg = vscode.workspace.getConfiguration("aimy");
 
-	let enableExtension = cfg.get<boolean>("enableExtension", false);
+	let enableExtension = cfg.get<boolean>("enableExtension", true);
+	let enableSoundEffects = cfg.get<boolean>("enableSoundEffects", true);
+	let soundVolume = cfg.get<number>("soundVolume", 80);
+	let enableStatsSave = cfg.get<boolean>("enableStatsSave", true);
+	let enableEffects = cfg.get<boolean>("enableEffects", true);
+
 	if (!enableExtension) {
 		vscode.window.showInformationMessage(
 			'AimY Extension is disabled in settings. Use the "AimY: Start Game" command to run the game manually.'
@@ -43,6 +48,10 @@ export function activate(context: vscode.ExtensionContext) {
 		targetSpeed = newCfg.get<number>("targetSpeed", 3000);
 		targetSize = newCfg.get<number>("targetSize", 100);
 		targetTimeExists = newCfg.get<number>("targetTimeExists", 3000);
+		enableSoundEffects = newCfg.get<boolean>("enableSoundEffects", true);
+		soundVolume = newCfg.get<number>("soundVolume", 80);
+		enableStatsSave = newCfg.get<boolean>("enableStatsSave", true);
+		enableEffects = newCfg.get<boolean>("enableEffects", true);
 		resetTimer();
 	});
 	context.subscriptions.push(configDisposable);
@@ -167,6 +176,9 @@ export function activate(context: vscode.ExtensionContext) {
 			targetSpeed,
 			targetSize,
 			targetTimeExists,
+			enableSoundEffects,
+			soundVolume,
+			enableEffects,
 		});
 
 		// Handle messages from webview
@@ -177,19 +189,22 @@ export function activate(context: vscode.ExtensionContext) {
 				}
 				if (message.command === "gameComplete") {
 					try {
-						await saveGameStats(context, {
-							score: message.score,
-							time: message.time,
-							accuracy: message.accuracy,
-							bestStreak: message.bestStreak,
-							timestamp: new Date().toISOString(),
-						});
+						if (enableStatsSave) {
+							await saveGameStats(context, {
+								score: message.score,
+								time: message.time,
+								accuracy: message.accuracy,
+								bestStreak: message.bestStreak,
+								timestamp: new Date().toISOString(),
+							});
+						}
 					} catch (err) {
 						console.error("Failed saving stats:", err);
 					}
 
 					suppressReopen = true;
 					endGame();
+
 					await vscode.window.withProgress(
 						{
 							location: vscode.ProgressLocation.Notification,
@@ -237,7 +252,7 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.window.withProgress(
 			{
 				location: vscode.ProgressLocation.Notification,
-				title: "Game Manually Started! Game is starting...",
+				title: `Game Manually Started! Game is starting...`,
 				cancellable: false,
 			},
 			async () => {
