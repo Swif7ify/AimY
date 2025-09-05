@@ -1,24 +1,17 @@
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
 import * as vscode from "vscode";
 import { getGameHTML } from "./gameHtml";
 
-// This method is called when your extension is activated
-// Your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
-	// Use the console to output diagnostic information (console.log) and errors (console.error)
-	// This line of code will only be executed once when your extension is activated
 	let idleTimer: NodeJS.Timeout | undefined; // can be modified
 	const changeDisposable = vscode.workspace.onDidChangeTextDocument(() => resetTimer());
 	context.subscriptions.push(changeDisposable);
 
-	// state
 	let targets = 10; // can be modified
 	let gameActive = false;
 	let gamePanel: vscode.WebviewPanel | undefined;
 	let openTabsDisposable: vscode.Disposable | undefined;
 	let savedTabs: vscode.Tab[] = [];
-	let suppressReopen = false; // when true, don't auto-reopen if panel is disposed
+	let suppressReopen = false;
 
 	function resetTimer() {
 		if (idleTimer) {
@@ -26,29 +19,37 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 
 		idleTimer = setTimeout(() => {
-			vscode.window.withProgress(
-				{
-					location: vscode.ProgressLocation.Notification,
-					title: "You have been idle for 5 seconds! Game is starting...",
-					cancellable: false,
-				},
-				async () => {
-					// keep notification visible for 3 seconds
-					await new Promise((res) => setTimeout(res, 3000));
-				}
-			);
-			showGame();
+			if (!gameActive) {
+				vscode.window.withProgress(
+					{
+						location: vscode.ProgressLocation.Notification,
+						title: "You have been idle for 5 seconds! Game is starting...",
+						cancellable: false,
+					},
+					async () => {
+						await new Promise((res) => setTimeout(res, 3000));
+					}
+				);
+				showGame();
+			}
 		}, 5 * 1000); // 5 seconds
 	}
 
 	resetTimer();
 
 	function showGame() {
-		if (gameActive) {
+		if (gameActive && !suppressReopen) {
+			return;
+		}
+
+		if (gameActive || suppressReopen) {
 			return;
 		}
 
 		gameActive = true;
+
+		vscode.commands.executeCommand("workbench.action.closeSidebar");
+		vscode.commands.executeCommand("workbench.action.closePanel");
 
 		// Save currently open tabs
 		savedTabs = vscode.window.tabGroups.all.flatMap((group) => group.tabs);
@@ -61,6 +62,22 @@ export function activate(context: vscode.ExtensionContext) {
 			enableScripts: true,
 			retainContextWhenHidden: true,
 		});
+
+		gamePanel.onDidDispose(
+			() => {
+				if (gameActive && !suppressReopen) {
+					gameActive = false;
+					setTimeout(() => {
+						showGame();
+					}, 200);
+				}
+			},
+			null,
+			context.subscriptions
+		);
+
+		const editorCfg = vscode.workspace.getConfiguration("editor");
+		const fontFamily = (editorCfg.get<string>("fontFamily") || "").toString();
 
 		// Prevent new tabs from opening while game is active
 		openTabsDisposable = vscode.window.onDidChangeActiveTextEditor(() => {
@@ -79,13 +96,14 @@ export function activate(context: vscode.ExtensionContext) {
 			}
 		});
 
-		gamePanel.webview.html = getGameHTML(targets);
+		gamePanel.webview.html = getGameHTML(targets, { fontFamily });
 
 		// Handle messages from webview
 		gamePanel.webview.onDidReceiveMessage(
 			(message) => {
 				switch (message.command) {
 					case "gameComplete":
+						suppressReopen = true;
 						endGame();
 						vscode.window.withProgress(
 							{
@@ -97,6 +115,8 @@ export function activate(context: vscode.ExtensionContext) {
 								await new Promise((res) => setTimeout(res, 3000));
 							}
 						);
+
+						suppressReopen = false;
 						return;
 				}
 			},
@@ -106,6 +126,7 @@ export function activate(context: vscode.ExtensionContext) {
 	}
 
 	function endGame() {
+		suppressReopen = true;
 		gameActive = false;
 
 		if (openTabsDisposable) {
@@ -129,9 +150,6 @@ export function activate(context: vscode.ExtensionContext) {
 		}, 500);
 	}
 
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with registerCommand
-	// The commandId parameter must match the command field in package.json
 	const disposable = vscode.commands.registerCommand("aimy.startGame", () => {
 		vscode.window.withProgress(
 			{
@@ -140,7 +158,6 @@ export function activate(context: vscode.ExtensionContext) {
 				cancellable: false,
 			},
 			async () => {
-				// keep notification visible for 3 seconds
 				await new Promise((res) => setTimeout(res, 3000));
 			}
 		);

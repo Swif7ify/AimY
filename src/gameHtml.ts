@@ -1,4 +1,6 @@
-export function getGameHTML(targetCount: number): string {
+export function getGameHTML(targetCount: number, opts?: { fontFamily?: string }): string {
+	const ff = (opts?.fontFamily || "Segoe UI").replace(/["`]/g, "");
+
 	return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,6 +8,15 @@ export function getGameHTML(targetCount: number): string {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AimY Game</title>
     <style>
+        :root {
+            /* Use VS Code theme colors (available inside webviews) with sensible fallbacks */
+            --font-family: ${ff};
+            --bg: var(--vscode-editor-background, #1e1e1e);
+            --fg: var(--vscode-editor-foreground, #d4d4d4);
+            --accent: var(--vscode-button-background, #007acc);
+            --target-red: #ff4444;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -13,9 +24,9 @@ export function getGameHTML(targetCount: number): string {
         }
         
         body {
-            background: linear-gradient(135deg, #1e1e1e, #2d2d30);
-            color: white;
-            font-family: 'Segoe UI', sans-serif;
+            background-color: var(--bg);
+            color: var(--fg);
+            font-family: 'Segoe UI', Roboto, sans-serif;
             height: 100vh;
             overflow: hidden;
             cursor: crosshair;
