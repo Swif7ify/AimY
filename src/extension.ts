@@ -7,10 +7,14 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(changeDisposable);
 
 	// game state
-	let targetGoals = 10; // can be modified
-	let targetSpeed;
-	let targetSize;
-	let targetTimeExists;
+	const cfg = vscode.workspace.getConfiguration("aimy");
+
+	let idleDelay = cfg.get<number>("idleTimer", 5000); // ms delay
+	let targetGoals = cfg.get<number>("targetGoals", 5); // number of targets to hit
+	let targetMove = cfg.get<boolean>("targetMove", false); // moving targets enabled
+	let targetSpeed = cfg.get<number>("targetSpeed", 3000); // ms per target
+	let targetSize = cfg.get<number>("targetSize", 100); // px diameter
+	let targetTimeExists = cfg.get<number>("targetTimeExists", 3000); // per-target timer enabled
 
 	let gameActive = false;
 	let gamePanel: vscode.WebviewPanel | undefined;
@@ -37,7 +41,7 @@ export function activate(context: vscode.ExtensionContext) {
 				);
 				showGame();
 			}
-		}, 5 * 1000); // 5 seconds
+		}, idleDelay);
 	}
 
 	resetTimer();
@@ -101,7 +105,14 @@ export function activate(context: vscode.ExtensionContext) {
 			}
 		});
 
-		gamePanel.webview.html = getGameHTML(targetGoals, { fontFamily });
+		gamePanel.webview.html = getGameHTML({
+			fontFamily,
+			targetGoals,
+			targetMove,
+			targetSpeed,
+			targetSize,
+			targetTimeExists,
+		});
 
 		// Handle messages from webview
 		gamePanel.webview.onDidReceiveMessage(
