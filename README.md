@@ -1,5 +1,9 @@
-# AimY 🎯
+# <div><img width="60" height="60" alt="icon" src="https://github.com/user-attachments/assets/a8b27b56-59c6-4ef6-9e55-19e4badd7889" /> AimY</div>
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> c0f03614a320e1a604c76f60e4c4ceaf41531516
 **Stop Coding, Start Shooting!**
 
 AimY is a VS Code extension that turns your idle time into aim training sessions. When you stop coding for a while, targets appear and you need to hit them to get back to work. It's like having a built-in break reminder that actually improves your mouse precision.
