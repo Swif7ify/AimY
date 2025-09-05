@@ -10,7 +10,7 @@
 		"Other"
 	],
 	"activationEvents": [
-		"*"
+		"onStartupFinished"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
@@ -19,7 +19,47 @@
 				"command": "aimy.startGame",
 				"title": "AimY: Start Game"
 			}
-		]
+		],
+		"configuration": {
+			"title": "AimY - Settings",
+			"properties": {
+				"aimy.enableExtension": {
+					"type": "boolean",
+					"default": true,
+					"description": "Enable/disable the AimY extension auto-start behavior."
+				},
+				"aimy.idleTimer": {
+					"type": "number",
+					"default": 60000,
+					"description": "Idle delay in milliseconds before the game auto-starts."
+				},
+				"aimy.targetGoals": {
+					"type": "number",
+					"default": 5,
+					"description": "Number of targets to hit to complete the game."
+				},
+				"aimy.targetMove": {
+					"type": "boolean",
+					"default": false,
+					"description": "Enable moving targets."
+				},
+				"aimy.targetSpeed": {
+					"type": "number",
+					"default": 3000,
+					"description": "Target movement speed (pixels/second)."
+				},
+				"aimy.targetSize": {
+					"type": "number",
+					"default": 100,
+					"description": "Target diameter in pixels."
+				},
+				"aimy.targetTimeExists": {
+					"type": "number",
+					"default": 3000,
+					"description": "How long (ms) a target exists before counting as a miss. Set 0 to disable."
+				}
+			}
+		}
 	},
 	"scripts": {
 		"vscode:prepublish": "npm run compile",

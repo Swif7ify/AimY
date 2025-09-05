@@ -46,6 +46,26 @@ export function activate(context: vscode.ExtensionContext) {
 	});
 	context.subscriptions.push(configDisposable);
 
+	const status = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
+	status.command = "aimy.toggle";
+	context.subscriptions.push(status);
+
+	function updateStatus() {
+		status.text = enableExtension ? "AimY: On" : "AimY: Off";
+		status.show();
+	}
+	updateStatus();
+
+	const toggleDisposable = vscode.commands.registerCommand("aimy.toggle", async () => {
+		enableExtension = !enableExtension;
+		await vscode.workspace
+			.getConfiguration("aimy")
+			.update("enableExtension", enableExtension, vscode.ConfigurationTarget.Global);
+		updateStatus();
+		resetTimer();
+	});
+	context.subscriptions.push(toggleDisposable);
+
 	let gameActive = false;
 	let gamePanel: vscode.WebviewPanel | undefined;
 	let openTabsDisposable: vscode.Disposable | undefined;
