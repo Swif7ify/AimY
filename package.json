@@ -93,5 +93,15 @@
 		"typescript": "^5.9.2",
 		"@vscode/test-cli": "^0.0.11",
 		"@vscode/test-electron": "^2.5.2"
-	}
+	},
+	"publisher": "your-publisher-id",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/Swif7ify/AimY"
+	},
+	"bugs": {
+		"url": "https://github.com/Swif7ify/AimY/issues"
+	},
+	"license": "MIT",
+	"icon": "images/icon.png"
 }
