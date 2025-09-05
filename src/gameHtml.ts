@@ -11,7 +11,7 @@ export function getGameHTML(opts?: {
 	const DEFAULT_SIZE = opts?.targetSize ?? 100;
 	const DEFAULT_MOVE = opts?.targetMove ?? false;
 	const DEFAULT_SPEED = opts?.targetSpeed ?? 3000;
-	const TIME_EXISTS = opts?.targetTimeExists ?? true;
+	const TIME_EXISTS = opts?.targetTimeExists ?? 3000;
 
 	return `<!DOCTYPE html>
 <html lang="en">
@@ -190,7 +190,7 @@ export function getGameHTML(opts?: {
         const raycaster = new THREE.Raycaster();
         const mouse = new THREE.Vector2();
 
-        function makeRealisticTarget(size = 100) {
+        function makeTarget(size = 100) {
             const group = new THREE.Group();
             const normalized = [1.0, 0.8, 0.6, 0.4, 0.2, 0.1];
             const colors = [0xffffff, 0xff4444, 0xffffff, 0xff4444, 0xffffff, 0xff0000];
@@ -231,7 +231,7 @@ export function getGameHTML(opts?: {
         function createTarget() {
             if (currentTarget) scene.remove(currentTarget);
             const size = ${DEFAULT_SIZE};
-            const target = makeRealisticTarget(size);
+            const target = makeTarget(size);
             const margin = size;
             const cx = Math.random() * (window.innerWidth - margin * 2) + margin;
             const cy = Math.random() * (window.innerHeight - margin * 2) + margin;

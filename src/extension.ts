@@ -2,19 +2,49 @@ import * as vscode from "vscode";
 import { getGameHTML } from "./gameHtml";
 
 export function activate(context: vscode.ExtensionContext) {
-	let idleTimer: NodeJS.Timeout | undefined; // can be modified
-	const changeDisposable = vscode.workspace.onDidChangeTextDocument(() => resetTimer());
-	context.subscriptions.push(changeDisposable);
-
 	// game state
 	const cfg = vscode.workspace.getConfiguration("aimy");
 
-	let idleDelay = cfg.get<number>("idleTimer", 5000); // ms delay
+	let enableExtension = cfg.get<boolean>("enableExtension", false);
+	if (!enableExtension) {
+		vscode.window.showInformationMessage(
+			'AimY Extension is disabled in settings. Use the "AimY: Start Game" command to run the game manually.'
+		);
+	}
+	let idleDelay = cfg.get<number>("idleTimer", 60000); // ms delay
 	let targetGoals = cfg.get<number>("targetGoals", 5); // number of targets to hit
 	let targetMove = cfg.get<boolean>("targetMove", false); // moving targets enabled
 	let targetSpeed = cfg.get<number>("targetSpeed", 3000); // ms per target
 	let targetSize = cfg.get<number>("targetSize", 100); // px diameter
 	let targetTimeExists = cfg.get<number>("targetTimeExists", 3000); // per-target timer enabled
+
+	let idleTimer: NodeJS.Timeout | undefined;
+	const changeDisposable = vscode.workspace.onDidChangeTextDocument(() => resetTimer());
+	const selDisposable = vscode.window.onDidChangeTextEditorSelection(() => {
+		resetTimer();
+	});
+	const activeDisposable = vscode.window.onDidChangeActiveTextEditor(() => {
+		resetTimer();
+	});
+	context.subscriptions.push(changeDisposable);
+	context.subscriptions.push(activeDisposable);
+	context.subscriptions.push(selDisposable);
+
+	const configDisposable = vscode.workspace.onDidChangeConfiguration((e) => {
+		if (!e.affectsConfiguration("aimy")) {
+			return;
+		}
+		const newCfg = vscode.workspace.getConfiguration("aimy");
+		enableExtension = newCfg.get<boolean>("enableExtension", true);
+		idleDelay = newCfg.get<number>("idleTimer", 10000);
+		targetGoals = newCfg.get<number>("targetGoals", 5);
+		targetMove = newCfg.get<boolean>("targetMove", false);
+		targetSpeed = newCfg.get<number>("targetSpeed", 3000);
+		targetSize = newCfg.get<number>("targetSize", 100);
+		targetTimeExists = newCfg.get<number>("targetTimeExists", 3000);
+		resetTimer();
+	});
+	context.subscriptions.push(configDisposable);
 
 	let gameActive = false;
 	let gamePanel: vscode.WebviewPanel | undefined;
@@ -25,6 +55,10 @@ export function activate(context: vscode.ExtensionContext) {
 	function resetTimer() {
 		if (idleTimer) {
 			clearTimeout(idleTimer);
+		}
+
+		if (!enableExtension) {
+			return;
 		}
 
 		idleTimer = setTimeout(() => {
