@@ -1,0 +1,68 @@
+name: Manual Version Bump
+
+on:
+    workflow_dispatch:
+        inputs:
+            bump_type:
+                description: "Version bump type"
+                required: true
+                default: "patch"
+                type: choice
+                options:
+                    - patch
+                    - minor
+                    - major
+
+jobs:
+    version-bump:
+        runs-on: ubuntu-latest
+        permissions:
+            contents: write
+
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
+                  token: ${{ secrets.GITHUB_TOKEN }}
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: "18"
+
+            - name: Install Universal Version Bump
+              run: npm install -g @universal-version-bump/cli
+
+            - name: Configure Git
+              run: |
+                  git config --local user.email "action@github.com"
+                  git config --local user.name "GitHub Action"
+
+            - name: Bump version
+              run: |
+                  echo "Current version:"
+                  uvb current
+                  echo "Bumping ${{ github.event.inputs.bump_type }} version..."
+                  uvb ${{ github.event.inputs.bump_type }}
+                  echo "New version:"
+                  uvb current
+
+            - name: Get new version
+              id: version
+              run: echo "new_version=$(uvb current)" >> $GITHUB_OUTPUT
+
+            - name: Commit and push changes
+              run: |
+                  git add package.json
+                  git commit -m "chore: bump version to ${{ steps.version.outputs.new_version }}"
+                  git push
+
+            - name: Create summary
+              run: |
+                  echo "## Version Bump Complete! 🎉" >> $GITHUB_STEP_SUMMARY
+                  echo "" >> $GITHUB_STEP_SUMMARY
+                  echo "**New version:** ${{ steps.version.outputs.new_version }}" >> $GITHUB_STEP_SUMMARY
+                  echo "**Bump type:** ${{ github.event.inputs.bump_type }}" >> $GITHUB_STEP_SUMMARY
+                  echo "" >> $GITHUB_STEP_SUMMARY
+                  echo "The version has been updated in package.json and committed to the repository." >> $GITHUB_STEP_SUMMARY
