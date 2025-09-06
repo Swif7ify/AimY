@@ -1,4 +1,4 @@
-# <div><img width="60" height="60" alt="icon" src="https://github.com/user-attachments/assets/a8b27b56-59c6-4ef6-9e55-19e4badd7889" /> AimY</div>
+# <div><img width="60" height="60" alt="icon" src="https://github.com/user-attachments/assets/a8b27b56-59c6-4ef6-9e55-19e4badd7889" /> AimY - Aim Trainer</div>
 
 **Stop Coding, Start Shooting!**
 
@@ -74,6 +74,7 @@ I built this because I noticed I'd often get stuck in long coding sessions witho
 The side benefit of improved mouse precision is just a bonus!
 
 ## Demo
+
 <p align="center">
   <img width="1887" height="966" alt="image1" src="https://github.com/user-attachments/assets/ed8fc054-2918-48f9-bd04-94018ba31542" />
 </p>

@@ -40,6 +40,10 @@ All notable changes to AimY will be documented in this file.
 ### Added
 -   Added demo images for visualization
 
+## [0.0.7] - 2025-01-06
+
+### Added
+-   Changed display name from AimY to AimY - Aim Trainer
 
 
 ### Features
