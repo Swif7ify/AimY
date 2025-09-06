@@ -31,11 +31,15 @@
 				"aimy.idleTimer": {
 					"type": "number",
 					"default": 60000,
+					"minimum": 1000,
+					"maximum": 3600000,
 					"description": "Idle delay in milliseconds before the game auto-starts."
 				},
 				"aimy.targetGoals": {
 					"type": "number",
 					"default": 5,
+					"minimum": 1,
+					"maximum": 1000,
 					"description": "Number of targets to hit to complete the game."
 				},
 				"aimy.targetMove": {
@@ -46,16 +50,22 @@
 				"aimy.targetSpeed": {
 					"type": "number",
 					"default": 3000,
-					"description": "Target movement speed (pixels/second)."
+					"minimum": 100,
+					"maximum": 60000,
+					"description": "Target movement speed (ms per move)."
 				},
 				"aimy.targetSize": {
 					"type": "number",
 					"default": 100,
+					"minimum": 10,
+					"maximum": 1000,
 					"description": "Target diameter in pixels."
 				},
 				"aimy.targetTimeExists": {
 					"type": "number",
 					"default": 3000,
+					"minimum": 0,
+					"maximum": 60000,
 					"description": "How long (ms) a target exists before counting as a miss. Set 0 to disable."
 				},
 				"aimy.statsFormat": {

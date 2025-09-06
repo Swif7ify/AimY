@@ -33,23 +33,40 @@ All notable changes to AimY will be documented in this file.
 ## [0.0.5] - 2025-01-06
 
 ### Added
+
 -   Added timeout in (`vscode.window.showInformationMessage()`)
 
 ## [0.0.6] - 2025-01-06
 
 ### Added
+
 -   Added demo images for visualization
 
 ## [0.0.7] - 2025-01-06
 
 ### Added
+
 -   Changed display name from AimY to AimY - Aim Trainer
 
 ## [0.0.8] - 2025-01-06
 
 ### Added
+
 -   Game visuals and HUD now match your editor’s dark or light theme.
 -   Changed cursor design and color now match your editor's dark or light theme.
+
+## [0.1.0] - 2025-01-06
+
+### Added
+
+-   Enforced configuration limits in the Settings UI and at runtime to prevent out-of-range values:
+    -   idleTimer: 1000–3600000 ms
+    -   targetGoals: 1–100
+    -   targetSpeed: 100–60000 ms
+    -   targetSize: 10–1000 px
+    -   targetTimeExists: 0–60000 ms
+    -   soundVolume: 0–100
+-   Runtime clamping added to extension to silently correct invalid settings edited manually.
 
 ### Features
 

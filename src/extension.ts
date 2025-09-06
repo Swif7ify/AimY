@@ -6,9 +6,16 @@ export function activate(context: vscode.ExtensionContext) {
 	// game state
 	const cfg = vscode.workspace.getConfiguration("aimy");
 
+	const clamp = (v: number, min: number, max: number) => {
+		if (!Number.isFinite(v)) {
+			return min;
+		}
+		return Math.max(min, Math.min(max, Math.round(v)));
+	};
+
 	let enableExtension = cfg.get<boolean>("enableExtension", true);
 	let enableSoundEffects = cfg.get<boolean>("enableSoundEffects", true);
-	let soundVolume = cfg.get<number>("soundVolume", 80);
+	let soundVolume = clamp(cfg.get<number>("soundVolume", 80), 0, 100);
 	let enableStatsSave = cfg.get<boolean>("enableStatsSave", true);
 	let enableEffects = cfg.get<boolean>("enableEffects", true);
 
@@ -24,12 +31,12 @@ export function activate(context: vscode.ExtensionContext) {
 			}
 		);
 	}
-	let idleDelay = cfg.get<number>("idleTimer", 60000); // ms delay
-	let targetGoals = cfg.get<number>("targetGoals", 5); // number of targets to hit
-	let targetMove = cfg.get<boolean>("targetMove", false); // moving targets enabled
-	let targetSpeed = cfg.get<number>("targetSpeed", 3000); // ms per target
-	let targetSize = cfg.get<number>("targetSize", 100); // px diameter
-	let targetTimeExists = cfg.get<number>("targetTimeExists", 3000); // per-target timer enabled
+	let idleDelay = clamp(cfg.get<number>("idleTimer", 60000), 1000, 3600000); // ms
+	let targetGoals = clamp(cfg.get<number>("targetGoals", 5), 1, 100);
+	let targetMove = cfg.get<boolean>("targetMove", false);
+	let targetSpeed = clamp(cfg.get<number>("targetSpeed", 3000), 100, 60000); // ms
+	let targetSize = clamp(cfg.get<number>("targetSize", 100), 10, 1000); // px
+	let targetTimeExists = clamp(cfg.get<number>("targetTimeExists", 3000), 0, 60000); // ms
 
 	let idleTimer: NodeJS.Timeout | undefined;
 	const changeDisposable = vscode.workspace.onDidChangeTextDocument(() => resetTimer());
@@ -49,14 +56,14 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 		const newCfg = vscode.workspace.getConfiguration("aimy");
 		enableExtension = newCfg.get<boolean>("enableExtension", true);
-		idleDelay = newCfg.get<number>("idleTimer", 10000);
-		targetGoals = newCfg.get<number>("targetGoals", 5);
+		idleDelay = clamp(newCfg.get<number>("idleTimer", 60000), 1000, 3600000);
+		targetGoals = clamp(newCfg.get<number>("targetGoals", 5), 1, 100);
 		targetMove = newCfg.get<boolean>("targetMove", false);
-		targetSpeed = newCfg.get<number>("targetSpeed", 3000);
-		targetSize = newCfg.get<number>("targetSize", 100);
-		targetTimeExists = newCfg.get<number>("targetTimeExists", 3000);
+		targetSpeed = clamp(newCfg.get<number>("targetSpeed", 3000), 100, 60000);
+		targetSize = clamp(newCfg.get<number>("targetSize", 100), 10, 1000);
+		targetTimeExists = clamp(newCfg.get<number>("targetTimeExists", 3000), 0, 60000);
 		enableSoundEffects = newCfg.get<boolean>("enableSoundEffects", true);
-		soundVolume = newCfg.get<number>("soundVolume", 80);
+		soundVolume = clamp(newCfg.get<number>("soundVolume", 80), 0, 100);
 		enableStatsSave = newCfg.get<boolean>("enableStatsSave", true);
 		enableEffects = newCfg.get<boolean>("enableEffects", true);
 		resetTimer();
