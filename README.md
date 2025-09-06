@@ -73,6 +73,14 @@ I built this because I noticed I'd often get stuck in long coding sessions witho
 
 The side benefit of improved mouse precision is just a bonus!
 
+## Demo
+<p align="center">
+  <img width="1887" height="966" alt="image1" src="https://github.com/user-attachments/assets/ed8fc054-2918-48f9-bd04-94018ba31542" />
+</p>
+<p align="center">
+  <img width="1887" height="966" alt="image2" src="https://github.com/user-attachments/assets/5160a05b-f01c-4c0e-9471-e052cdd53d27" />
+</p>
+
 ## Stats & Privacy
 
 -   All stats are saved locally on your machine
