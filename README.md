@@ -76,10 +76,10 @@ The side benefit of improved mouse precision is just a bonus!
 ## Demo
 
 <p align="center">
-  <img width="auto" height="auto" alt="image1" src="https://github.com/user-attachments/assets/ed8fc054-2918-48f9-bd04-94018ba31542" />
+  <img width="auto" height="auto" alt="image1" src="https://github.com/user-attachments/assets/31a6ef25-e08c-47e2-ba6d-8ff875f02586" />
 </p>
 <p align="center">
-  <img width="auto" height="auto" alt="image2" src="https://github.com/user-attachments/assets/5160a05b-f01c-4c0e-9471-e052cdd53d27" />
+  <img width="auto" height="auto" alt="image2" src="https://github.com/user-attachments/assets/774342e8-40d0-416f-93dd-d7db0c58ac3b" />
 </p>
 
 ## Stats & Privacy
