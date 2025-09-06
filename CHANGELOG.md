@@ -30,10 +30,10 @@ All notable changes to AimY will be documented in this file.
 -   "Reset to defaults" setting implemented (`aimy.resetDefaultSettings`)
 -   README and packaging metadata updates (publisher, repository, icon)
 
-## [0.0.4] - 2025-01-05
+## [0.0.5] - 2025-01-05
 
 ### Added
--   Added timeout on the 
+-   Added timeout in (`vscode.window.showInformationMessage()`)
 
 ### Features
 
