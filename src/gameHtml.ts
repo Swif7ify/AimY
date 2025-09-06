@@ -33,6 +33,13 @@ export function getGameHTML(opts?: {
 	const HIT_COLOR = IS_LIGHT ? "#008000" : "#00ff41";
 	const MISS_COLOR = IS_LIGHT ? "#b30000" : "#ff4444";
 
+	const makeCursorDataUrl = (strokeColor: string) => {
+		const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"><circle cx="16" cy="16" r="12" stroke="${strokeColor}" stroke-width="2" fill="none"/><line x1="16" y1="4" x2="16" y2="28" stroke="${strokeColor}" stroke-width="2"/><line x1="4" y1="16" x2="28" y2="16" stroke="${strokeColor}" stroke-width="2"/></svg>`;
+		return `url("data:image/svg+xml;utf8,${encodeURIComponent(svg)}") 16 16, crosshair`;
+	};
+
+	const CURSOR_COLOR = IS_LIGHT ? makeCursorDataUrl("#111") : makeCursorDataUrl("#ffffff");
+
 	return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -47,6 +54,7 @@ export function getGameHTML(opts?: {
             --accent: var(--vscode-button-background, #007acc);
             --target-red: #ff4444;
             --target-white: ${TARGET_WHITE};
+            --cursor: ${CURSOR_COLOR};
 
             /* HUD theme-aware vars */
             --hud-bg: ${HUD_BG};
@@ -64,7 +72,7 @@ export function getGameHTML(opts?: {
             font-family: var(--font-family), 'Segoe UI', Roboto, sans-serif;
             height: 100vh;
             overflow: hidden;
-            cursor: crosshair;
+            cursor: var(--cursor, crosshair);
         }
         .game-container { position: relative; width: 100vw; height: 100vh; }
         .hud {

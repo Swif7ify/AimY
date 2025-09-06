@@ -49,6 +49,7 @@ All notable changes to AimY will be documented in this file.
 
 ### Added
 -   Game visuals and HUD now match your editor’s dark or light theme.
+-   Changed cursor design and color now match your editor's dark or light theme.
 
 ### Features
 
