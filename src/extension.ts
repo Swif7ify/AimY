@@ -13,8 +13,15 @@ export function activate(context: vscode.ExtensionContext) {
 	let enableEffects = cfg.get<boolean>("enableEffects", true);
 
 	if (!enableExtension) {
-		vscode.window.showInformationMessage(
-			'AimY Extension is disabled in settings. Use the "AimY: Start Game" command to run the game manually.'
+		vscode.window.withProgress(
+			{
+				location: vscode.ProgressLocation.Notification,
+				title: 'AimY Extension is disabled in settings. Use the "AimY: Start Game" command to run the game manually.',
+				cancellable: false,
+			},
+			async () => {
+				await new Promise((res) => setTimeout(res, 3000));
+			}
 		);
 	}
 	let idleDelay = cfg.get<number>("idleTimer", 60000); // ms delay

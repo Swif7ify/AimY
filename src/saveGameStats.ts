@@ -81,19 +81,37 @@ export async function saveGameStats(context: vscode.ExtensionContext, stats: any
 			} else {
 				await fs.promises.appendFile(csvPath, row + "\n", "utf8");
 			}
-			vscode.window.showInformationMessage(`AimY: saved stats to ${csvPath}`);
+			vscode.window.withProgress(
+				{
+					location: vscode.ProgressLocation.Notification,
+					title: `AimY: saved stats to ${csvPath}`,
+					cancellable: false,
+				},
+				async () => {
+					await new Promise((res) => setTimeout(res, 3000));
+				}
+			);
 			return csvPath;
 		} else {
 			const out = Object.assign({}, stats, { settings: settingsObj });
 			const name = `aimy-stats-${new Date().toISOString().replace(/[:.]/g, "-")}.json`;
 			const filePath = path.join(outDir, name);
 			await fs.promises.writeFile(filePath, JSON.stringify(out, null, 2), "utf8");
-			vscode.window.showInformationMessage(`AimY: saved stats to ${filePath}`);
+			vscode.window.withProgress(
+				{
+					location: vscode.ProgressLocation.Notification,
+					title: `AimY: saved stats to ${filePath}`,
+					cancellable: false,
+				},
+				async () => {
+					await new Promise((res) => setTimeout(res, 3000));
+				}
+			);
 			return filePath;
 		}
 	} catch (err) {
 		console.error("AimY: failed to save stats", err);
-		vscode.window.showErrorMessage("AimY: failed to save stats. See developer console.");
+		vscode.window.showErrorMessage("AimY: failed to save stats. Report the problem.");
 		return null;
 	}
 }
