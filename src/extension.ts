@@ -176,6 +176,8 @@ export function activate(context: vscode.ExtensionContext) {
 			}
 		});
 
+		const isLightTheme = vscode.window.activeColorTheme.kind === vscode.ColorThemeKind.Light;
+
 		gamePanel.webview.html = getGameHTML({
 			fontFamily,
 			targetGoals,
@@ -186,6 +188,7 @@ export function activate(context: vscode.ExtensionContext) {
 			enableSoundEffects,
 			soundVolume,
 			enableEffects,
+			isLight: isLightTheme,
 		});
 
 		// Handle messages from webview

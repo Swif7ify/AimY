@@ -45,6 +45,10 @@ All notable changes to AimY will be documented in this file.
 ### Added
 -   Changed display name from AimY to AimY - Aim Trainer
 
+## [0.0.8] - 2025-01-06
+
+### Added
+-   Game visuals and HUD now match your editor’s dark or light theme.
 
 ### Features
 

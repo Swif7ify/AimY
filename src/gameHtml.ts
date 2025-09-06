@@ -8,8 +8,10 @@ export function getGameHTML(opts?: {
 	enableSoundEffects?: boolean;
 	soundVolume?: number;
 	enableEffects?: boolean;
+	isLight?: boolean;
 }): string {
 	const ff = (opts?.fontFamily || "Segoe UI").replace(/["`]/g, "");
+	const IS_LIGHT = !!opts?.isLight;
 	const TARGET_GOALS = opts?.targetGoals ?? 5;
 	const DEFAULT_SIZE = opts?.targetSize ?? 100;
 	const DEFAULT_MOVE = opts?.targetMove ?? false;
@@ -18,6 +20,18 @@ export function getGameHTML(opts?: {
 	const SOUND_EFFECTS = opts?.enableSoundEffects ?? true;
 	const SOUND_VOLUME = opts?.soundVolume ?? 80;
 	const ENABLE_EFFECTS = opts?.enableEffects ?? true;
+
+	// theme-aware colors for HUD and effects
+	const TARGET_WHITE = IS_LIGHT ? "#111111" : "#ffffff";
+	const TARGET_WHITE_HEX = IS_LIGHT ? "0x111111" : "0xffffff";
+
+	const HUD_BG = IS_LIGHT ? "rgba(255,255,255,0.86)" : "rgba(0,0,0,0.28)";
+	const HUD_TEXT = IS_LIGHT ? "#111111" : "var(--fg)";
+	const HUD_ACCENT = IS_LIGHT ? "#0a66ff" : "var(--accent)";
+	const SCORE_COLOR = IS_LIGHT ? "#006900" : "#00ff41";
+	const HIT_SHADOW = IS_LIGHT ? "0 0 8px rgba(0, 150, 0, 0.25)" : "0 0 15px #00ff41";
+	const HIT_COLOR = IS_LIGHT ? "#008000" : "#00ff41";
+	const MISS_COLOR = IS_LIGHT ? "#b30000" : "#ff4444";
 
 	return `<!DOCTYPE html>
 <html lang="en">
@@ -32,9 +46,16 @@ export function getGameHTML(opts?: {
             --fg: var(--vscode-editor-foreground, #d4d4d4);
             --accent: var(--vscode-button-background, #007acc);
             --target-red: #ff4444;
-            --target-white: #ffffff;
-            --target-black: #000000;
-            --target-blue: #4444ff;
+            --target-white: ${TARGET_WHITE};
+
+            /* HUD theme-aware vars */
+            --hud-bg: ${HUD_BG};
+            --hud-text: ${HUD_TEXT};
+            --hud-accent: ${HUD_ACCENT};
+            --score-color: ${SCORE_COLOR};
+            --hit-shadow: ${HIT_SHADOW};
+            --hit-color: ${HIT_COLOR};
+            --miss-color: ${MISS_COLOR};
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -55,19 +76,19 @@ export function getGameHTML(opts?: {
             align-items: center;
             gap: 18px;
             padding: 8px 12px;
-            background: rgba(0,0,0,0.28);
+            background: var(--hud-bg);
+            color: var(--hud-text);
             border-radius: 10px;
             backdrop-filter: blur(6px);
-            box-shadow: 0 4px 18px rgba(0,0,0,0.6);
+            box-shadow: 0 4px 18px rgba(0,0,0,0.16);
             font-size: 13px;
-            color: var(--fg);
         }
         .hud-title {
             font-size: 13px;
             font-weight: 700;
-            color: var(--accent);
+            color: var(--hud-accent);
             padding-right: 12px;
-            border-right: 1px solid rgba(255,255,255,0.06);
+            border-right: 1px solid rgba(0,0,0,0.06);
             margin-right: 6px;
             white-space: nowrap;
         }
@@ -76,28 +97,28 @@ export function getGameHTML(opts?: {
             align-items: center;
             gap: 8px;
             font-weight: 500;
-            color: rgba(255,255,255,0.9);
+            color: var(--hud-text);
             white-space: nowrap;
         }
-        .score { color: #00ff41; font-weight: 700; text-shadow: none; }
+        .score { color: var(--score-color); font-weight: 700; text-shadow: none; }
         .hit-effect {
             position: absolute;
-            color: #00ff41;
+            color: var(--hit-color);
             font-size: 36px;
             font-weight: bold;
             pointer-events: none;
             animation: hitAnimation 1.5s ease-out forwards;
-            text-shadow: 0 0 15px #00ff41;
+            text-shadow: var(--hit-shadow);
             z-index: 1600;
         }
         .miss-effect {
             position: absolute;
-            color: #ff4444;
+            color: var(--miss-color);
             font-size: 28px;
             font-weight: bold;
             pointer-events: none;
             animation: missAnimation 1s ease-out forwards;
-            text-shadow: 0 0 10px #ff4444;
+            text-shadow: 0 0 10px rgba(0,0,0,0.15);
             z-index: 1600;
         }
         @keyframes hitAnimation {
@@ -145,6 +166,7 @@ export function getGameHTML(opts?: {
         const SOUND_EFFECTS = ${JSON.stringify(SOUND_EFFECTS)};
         const SOUND_VOLUME = ${Number(SOUND_VOLUME)};
         const ENABLE_EFFECTS = ${JSON.stringify(ENABLE_EFFECTS)};
+        const TARGET_WHITE_HEX = ${TARGET_WHITE_HEX};
 
         let audioCtx = null;
         let masterGain = null;
@@ -260,8 +282,8 @@ export function getGameHTML(opts?: {
 
         function makeTarget(size = 100) {
             const group = new THREE.Group();
+            const colors = [TARGET_WHITE_HEX, 0xff4444, TARGET_WHITE_HEX, 0xff4444, TARGET_WHITE_HEX, 0xff0000];
             const normalized = [1.0, 0.8, 0.6, 0.4, 0.2, 0.1];
-            const colors = [0xffffff, 0xff4444, 0xffffff, 0xff4444, 0xffffff, 0xff0000];
             const radii = normalized.map(r => (size / 2) * r);
 
             for (let i = 0; i < radii.length; i++) {
