@@ -103,6 +103,11 @@
 					"type": "boolean",
 					"default": true,
 					"description": "Enable visual effects like particles and hit/miss animations."
+				},
+				"aimy.closeWorkspaceOnGameStart": {
+					"type": "boolean",
+					"default": true,
+					"description": "Automatically close the current tabs when the game starts."
 				}
 			}
 		}
