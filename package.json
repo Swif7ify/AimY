@@ -107,7 +107,7 @@
 				"aimy.closeWorkspaceOnGameStart": {
 					"type": "boolean",
 					"default": true,
-					"description": "Automatically close the current tabs when the game starts."
+					"description": "Close all open editors when the game starts and restore them after completion."
 				}
 			}
 		}

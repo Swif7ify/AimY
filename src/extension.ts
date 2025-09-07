@@ -51,7 +51,7 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(activeDisposable);
 	context.subscriptions.push(selDisposable);
 
-	const configDisposable = vscode.workspace.onDidChangeConfiguration((e) => {
+	const configDisposable = vscode.workspace. onDidChangeConfiguration((e) => {
 		if (!e.affectsConfiguration("aimy")) {
 			return;
 		}
@@ -169,7 +169,7 @@ export function activate(context: vscode.ExtensionContext) {
 		const editorCfg = vscode.workspace.getConfiguration("editor");
 		const fontFamily = (editorCfg.get<string>("fontFamily") || "").toString();
 
-		if (closeWorkspaceOnGameStart) {
+		if (closeWorkspaceOnGameStart && gameActive) {
 			// Prevent new tabs from opening while game is active
 			openTabsDisposable = vscode.window.onDidChangeActiveTextEditor(() => {
 				if (gameActive && vscode.window.activeTextEditor) {

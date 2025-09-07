@@ -55,7 +55,7 @@ All notable changes to AimY will be documented in this file.
 -   Game visuals and HUD now match your editor’s dark or light theme.
 -   Changed cursor design and color now match your editor's dark or light theme.
 
-## [0.1.0] - 2025-01-06
+## [0.0.10] - 2025-01-06
 
 ### Added
 
@@ -67,6 +67,12 @@ All notable changes to AimY will be documented in this file.
     -   targetTimeExists: 0–60000 ms
     -   soundVolume: 0–100
 -   Runtime clamping added to extension to silently correct invalid settings edited manually.
+
+## [0.0.11] - 2025-01-08
+
+### Added
+
+-   Added `aimy.closeWorkspaceOnGameStart` setting to control whether open editors are closed when a game starts. When disabled, the extension will not close editors and will instead return focus to the game if you switch tabs.
 
 ### Features
 
