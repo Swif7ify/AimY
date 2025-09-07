@@ -1,4 +1,4 @@
-# <div><img width="60" height="60" alt="icon" src="https://github.com/user-attachments/assets/a8b27b56-59c6-4ef6-9e55-19e4badd7889" /> AimY - Aim Trainer</div>
+AimY - Aim Trainer</div>
 
 **Stop Coding, Start Shooting!**
 
@@ -76,10 +76,10 @@ The side benefit of improved mouse precision is just a bonus!
 ## Demo
 
 <p align="center">
-  <img width="auto" height="auto" alt="image1" src="https://github.com/user-attachments/assets/31a6ef25-e08c-47e2-ba6d-8ff875f02586" />
+  <img width="auto" height="auto" alt="image1" src="https://github.com/user-attachments/assets/35dc2580-e678-4848-9e65-f732ffbcceae" />
 </p>
 <p align="center">
-  <img width="auto" height="auto" alt="image2" src="https://github.com/user-attachments/assets/774342e8-40d0-416f-93dd-d7db0c58ac3b" />
+  <img width="auto" height="auto" alt="image2" src="https://github.com/user-attachments/assets/cd3a45ee-4482-4bb2-8d17-a08286c0b71d" />
 </p>
 
 ## Stats & Privacy
