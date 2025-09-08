@@ -103,6 +103,11 @@
 					"type": "boolean",
 					"default": true,
 					"description": "Enable visual effects like particles and hit/miss animations."
+				},
+				"aimy.closeWorkspaceOnGameStart": {
+					"type": "boolean",
+					"default": true,
+					"description": "Close all open editors when the game starts and restore them after completion."
 				}
 			}
 		}

@@ -18,6 +18,7 @@ export function activate(context: vscode.ExtensionContext) {
 	let soundVolume = clamp(cfg.get<number>("soundVolume", 80), 0, 100);
 	let enableStatsSave = cfg.get<boolean>("enableStatsSave", true);
 	let enableEffects = cfg.get<boolean>("enableEffects", true);
+	let closeWorkspaceOnGameStart = cfg.get<boolean>("closeWorkspaceOnGameStart", true);
 
 	if (!enableExtension) {
 		vscode.window.withProgress(
@@ -50,7 +51,7 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(activeDisposable);
 	context.subscriptions.push(selDisposable);
 
-	const configDisposable = vscode.workspace.onDidChangeConfiguration((e) => {
+	const configDisposable = vscode.workspace. onDidChangeConfiguration((e) => {
 		if (!e.affectsConfiguration("aimy")) {
 			return;
 		}
@@ -66,6 +67,7 @@ export function activate(context: vscode.ExtensionContext) {
 		soundVolume = clamp(newCfg.get<number>("soundVolume", 80), 0, 100);
 		enableStatsSave = newCfg.get<boolean>("enableStatsSave", true);
 		enableEffects = newCfg.get<boolean>("enableEffects", true);
+		closeWorkspaceOnGameStart = newCfg.get<boolean>("closeWorkspaceOnGameStart", true);
 		resetTimer();
 	});
 	context.subscriptions.push(configDisposable);
@@ -138,11 +140,12 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.commands.executeCommand("workbench.action.closeSidebar");
 		vscode.commands.executeCommand("workbench.action.closePanel");
 
-		// Save currently open tabs
-		savedTabs = vscode.window.tabGroups.all.flatMap((group) => group.tabs);
-
-		// Close all tabs
-		vscode.commands.executeCommand("workbench.action.closeAllEditors");
+		if (closeWorkspaceOnGameStart) {
+			// Save currently open tabs
+			savedTabs = vscode.window.tabGroups.all.flatMap((group) => group.tabs);
+			// Close all tabs
+			vscode.commands.executeCommand("workbench.action.closeAllEditors");
+		}
 
 		// Create fullscreen game webview
 		gamePanel = vscode.window.createWebviewPanel("aimyGame", "AimY - Hit the Targets!", vscode.ViewColumn.One, {
@@ -166,22 +169,24 @@ export function activate(context: vscode.ExtensionContext) {
 		const editorCfg = vscode.workspace.getConfiguration("editor");
 		const fontFamily = (editorCfg.get<string>("fontFamily") || "").toString();
 
-		// Prevent new tabs from opening while game is active
-		openTabsDisposable = vscode.window.onDidChangeActiveTextEditor(() => {
-			if (gameActive && vscode.window.activeTextEditor) {
-				vscode.commands.executeCommand("workbench.action.closeActiveEditor");
-				vscode.window.withProgress(
-					{
-						location: vscode.ProgressLocation.Notification,
-						title: "Complete the game to unlock editing!",
-						cancellable: false,
-					},
-					async () => {
-						await new Promise((res) => setTimeout(res, 3000));
-					}
-				);
-			}
-		});
+		if (closeWorkspaceOnGameStart && gameActive) {
+			// Prevent new tabs from opening while game is active
+			openTabsDisposable = vscode.window.onDidChangeActiveTextEditor(() => {
+				if (gameActive && vscode.window.activeTextEditor) {
+					vscode.commands.executeCommand("workbench.action.closeActiveEditor");
+					vscode.window.withProgress(
+						{
+							location: vscode.ProgressLocation.Notification,
+							title: "Complete the game to unlock editing!",
+							cancellable: false,
+						},
+						async () => {
+							await new Promise((res) => setTimeout(res, 3000));
+						}
+					);
+				}
+			});
+		}
 
 		const isLightTheme = vscode.window.activeColorTheme.kind === vscode.ColorThemeKind.Light;
 
@@ -254,15 +259,17 @@ export function activate(context: vscode.ExtensionContext) {
 			gamePanel = undefined;
 		}
 
-		// Restore previously open tabs
-		setTimeout(() => {
-			savedTabs.forEach((tab) => {
-				if (tab.input && typeof tab.input === "object" && tab.input !== null && (tab.input as any).uri) {
-					vscode.window.showTextDocument((tab.input as any).uri, { preview: false });
-				}
-			});
-			savedTabs = [];
-		}, 500);
+		if (closeWorkspaceOnGameStart) {
+			// Restore previously open tabs
+			setTimeout(() => {
+				savedTabs.forEach((tab) => {
+					if (tab.input && typeof tab.input === "object" && tab.input !== null && (tab.input as any).uri) {
+						vscode.window.showTextDocument((tab.input as any).uri, { preview: false });
+					}
+				});
+				savedTabs = [];
+			}, 500);
+		}
 	}
 
 	const disposable = vscode.commands.registerCommand("aimy.startGame", () => {

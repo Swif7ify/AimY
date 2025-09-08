@@ -68,6 +68,12 @@ All notable changes to AimY will be documented in this file.
     -   soundVolume: 0–100
 -   Runtime clamping added to extension to silently correct invalid settings edited manually.
 
+## [0.0.11] - 2025-01-08
+
+### Added
+
+-   Added `aimy.closeWorkspaceOnGameStart` setting to control whether open editors are closed when a game starts. When disabled, the extension will not close editors and will instead return focus to the game if you switch tabs.
+
 ### Features
 
 -   🎯 Interactive target shooting game
