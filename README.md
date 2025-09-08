@@ -52,20 +52,21 @@ The extension works out of the box with sensible defaults. You can also:
 
 All settings are available in VS Code settings under the "AimY" section:
 
-| Setting                   | Default  | Description                                                                 |
-| ------------------------- | -------- | --------------------------------------------------------------------------- |
-| `aimy.enableExtension`    | `true`   | Enable/disable automatic game triggering                                    |
-| `aimy.idleTimer`          | `60000`  | Idle time in milliseconds before game starts                                |
-| `aimy.targetGoals`        | `5`      | Targets required to complete a session                                      |
-| `aimy.targetSize`         | `100`    | Target diameter in pixels                                                   |
-| `aimy.targetMove`         | `false`  | Enable moving targets                                                       |
-| `aimy.targetSpeed`        | `3000`   | Movement speed (px/s)                                                       |
-| `aimy.targetTimeExists`   | `3000`   | How long a target exists before counting as a miss (0 = disabled)           |
-| `aimy.statsFormat`        | `"json"` | Save format for stats: `"json"` (one file per run) or `"csv"` (append rows) |
-| `aimy.statsDirectory`     | `""`     | Directory to save stats (empty = extension storage)                         |
-| `aimy.enableSoundEffects` | `true`   | Enable hit/miss sounds                                                      |
-| `aimy.soundVolume`        | `80`     | Sound volume (0–100)                                                        |
-| `aimy.enableEffects`      | `true`   | Enable visual particles                                                     |
+| Setting                          | Default  | Description                                                                 |
+| -------------------------------- | -------- | --------------------------------------------------------------------------- |
+| `aimy.enableExtension`           | `true`   | Enable/disable automatic game triggering                                    |
+| `aimy.idleTimer`                 | `60000`  | Idle time in milliseconds before game starts                                |
+| `aimy.targetGoals`               | `5`      | Targets required to complete a session                                      |
+| `aimy.targetSize`                | `100`    | Target diameter in pixels                                                   |
+| `aimy.targetMove`                | `false`  | Enable moving targets                                                       |
+| `aimy.targetSpeed`               | `3000`   | Movement speed (px/s)                                                       |
+| `aimy.targetTimeExists`          | `3000`   | How long a target exists before counting as a miss (0 = disabled)           |
+| `aimy.statsFormat`               | `"json"` | Save format for stats: `"json"` (one file per run) or `"csv"` (append rows) |
+| `aimy.statsDirectory`            | `""`     | Directory to save stats (empty = extension storage)                         |
+| `aimy.enableSoundEffects`        | `true`   | Enable hit/miss sounds                                                      |
+| `aimy.soundVolume`               | `80`     | Sound volume (0–100)                                                        |
+| `aimy.enableEffects`             | `true`   | Enable visual particles                                                     |
+| `aimy.closeWorkspaceOnGameStart` | `true`   | Control whether open editors are closed when a game starts                  |
 
 ## Why AimY?
 
