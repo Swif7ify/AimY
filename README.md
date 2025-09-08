@@ -35,7 +35,7 @@ Moving targets, timed challenges, and accuracy scoring help improve your mouse c
 
 ## Installation
 
-1. Install from the VS Code Marketplace
+1. Install from the [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=EarlRomeoOrdovez.aimy&ssr=false#review-details) or search AimY directly in VSCode
 2. Restart VS Code
 3. The extension activates automatically
 4. Start coding and wait for your first challenge!
