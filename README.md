@@ -1,4 +1,10 @@
-AimY - Aim Trainer</div>
+# <div><img width="60" height="60" alt="icon" src="https://github.com/user-attachments/assets/a8b27b56-59c6-4ef6-9e55-19e4badd7889" /> AimY - Aim Trainer</div>
+
+![Visual Studio Marketplace](https://img.shields.io/badge/VS%20Marketplace-Published-blue?logo=visualstudiocode&logoColor=white)
+![Version](https://img.shields.io/visual-studio-marketplace/v/EarlRomeoOrdovez.aimy)
+![Downloads](https://img.shields.io/visual-studio-marketplace/d/EarlRomeoOrdovez.aimy)
+![Installs](https://img.shields.io/visual-studio-marketplace/i/EarlRomeoOrdovez.aimy)
+![Rating](https://img.shields.io/visual-studio-marketplace/r/EarlRomeoOrdovez.aimy)
 
 **Stop Coding, Start Shooting!**
 
