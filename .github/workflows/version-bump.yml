@@ -31,26 +31,24 @@ jobs:
               with:
                   node-version: "18"
 
-            - name: Install Universal Version Bump
-              run: npm install -g @universal-version-bump/cli
-
             - name: Configure Git
               run: |
                   git config --local user.email "action@github.com"
                   git config --local user.name "GitHub Action"
 
+            - name: Get current version
+              id: current_version
+              run: echo "current_version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
+
             - name: Bump version
               run: |
-                  echo "Current version:"
-                  uvb current
+                  echo "Current version: ${{ steps.current_version.outputs.current_version }}"
                   echo "Bumping ${{ github.event.inputs.bump_type }} version..."
-                  uvb ${{ github.event.inputs.bump_type }}
-                  echo "New version:"
-                  uvb current
+                  npm version ${{ github.event.inputs.bump_type }} --no-git-tag-version
 
             - name: Get new version
               id: version
-              run: echo "new_version=$(uvb current)" >> $GITHUB_OUTPUT
+              run: echo "new_version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
 
             - name: Commit and push changes
               run: |
