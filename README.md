@@ -1,4 +1,15 @@
-AimY - Aim Trainer</div>
+# <div><img width="60" height="60" alt="icon" src="https://github.com/user-attachments/assets/a8b27b56-59c6-4ef6-9e55-19e4badd7889" /> AimY - Aim Trainer</div>
+
+[![Visual Studio Marketplace](https://img.shields.io/badge/VS%20Marketplace-Published-blue?logo=visualstudiocode&logoColor=white)](https://marketplace.visualstudio.com/items?itemName=EarlRomeoOrdovez.aimy)
+![Version](https://img.shields.io/visual-studio-marketplace/v/EarlRomeoOrdovez.aimy)
+![Downloads](https://img.shields.io/visual-studio-marketplace/d/EarlRomeoOrdovez.aimy)
+![Installs](https://img.shields.io/visual-studio-marketplace/i/EarlRomeoOrdovez.aimy)
+![Rating](https://img.shields.io/visual-studio-marketplace/r/EarlRomeoOrdovez.aimy)
+
+<!-- Tech stack -->
+![Three.js](https://img.shields.io/badge/Three.js-3D-6E40C9?logo=three.js&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?logo=typescript&logoColor=white)
+![VS Code API](https://img.shields.io/badge/VS%20Code%20API-Latest-007ACC?logo=visualstudiocode&logoColor=white)
 
 **Stop Coding, Start Shooting!**
 
@@ -35,7 +46,7 @@ Moving targets, timed challenges, and accuracy scoring help improve your mouse c
 
 ## Installation
 
-1. Install from the VS Code Marketplace
+1. Install from the [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=EarlRomeoOrdovez.aimy&ssr=false#review-details) or search AimY directly in VSCode
 2. Restart VS Code
 3. The extension activates automatically
 4. Start coding and wait for your first challenge!
@@ -77,10 +88,10 @@ The side benefit of improved mouse precision is just a bonus!
 ## Demo
 
 <p align="center">
-  <img width="auto" height="auto" alt="image1" src="https://github.com/user-attachments/assets/35dc2580-e678-4848-9e65-f732ffbcceae" />
+  <img width="400" height="400" alt="image1" src="https://github.com/user-attachments/assets/35dc2580-e678-4848-9e65-f732ffbcceae" />
 </p>
 <p align="center">
-  <img width="auto" height="auto" alt="image2" src="https://github.com/user-attachments/assets/cd3a45ee-4482-4bb2-8d17-a08286c0b71d" />
+  <img width="400" height="400" alt="image2" src="https://github.com/user-attachments/assets/cd3a45ee-4482-4bb2-8d17-a08286c0b71d" />
 </p>
 
 ## Stats & Privacy
