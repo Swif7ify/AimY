@@ -72,12 +72,21 @@ All settings are available in VS Code settings under the "AimY" section:
 | `aimy.targetMove`                | `false`  | Enable moving targets                                                       |
 | `aimy.targetSpeed`               | `3000`   | Movement speed (px/s)                                                       |
 | `aimy.targetTimeExists`          | `3000`   | How long a target exists before counting as a miss (0 = disabled)           |
+| `aimy.difficulty`                | `"normal"` | Preset difficulty: `easy`, `normal`, `hard`, `very hard`, `custom`. Choosing a preset applies tuned game parameters; `custom` uses your individual settings. |
 | `aimy.statsFormat`               | `"json"` | Save format for stats: `"json"` (one file per run) or `"csv"` (append rows) |
 | `aimy.statsDirectory`            | `""`     | Directory to save stats (empty = extension storage)                         |
 | `aimy.enableSoundEffects`        | `true`   | Enable hit/miss sounds                                                      |
 | `aimy.soundVolume`               | `80`     | Sound volume (0–100)                                                        |
 | `aimy.enableEffects`             | `true`   | Enable visual particles                                                     |
-| `aimy.closeWorkspaceOnGameStart` | `true`   | Control whether open editors are closed when a game starts                  |
+| `aimy.closeWorkspaceOnGameStart` | `true`   | Control whether open editors are closed when a game starts       
+
+### Difficulty presets
+Choose `aimy.difficulty` to quickly switch sets of parameters:
+- easy — fewer, larger, slower targets (good warmup)
+- normal — balanced default
+- hard — more, faster, smaller targets
+- very hard — extreme values for advanced training
+- custom — use the individual `aimy.*` settings you configured           |
 
 ## Why AimY?
 

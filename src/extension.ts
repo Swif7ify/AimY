@@ -3,7 +3,6 @@ import { getGameHTML } from "./gameHtml";
 import { saveGameStats } from "./saveGameStats";
 
 export function activate(context: vscode.ExtensionContext) {
-	// game state
 	const cfg = vscode.workspace.getConfiguration("aimy");
 
 	const clamp = (v: number, min: number, max: number) => {
@@ -11,6 +10,23 @@ export function activate(context: vscode.ExtensionContext) {
 			return min;
 		}
 		return Math.max(min, Math.min(max, Math.round(v)));
+	};
+
+	const DIFFICULTY_PRESETS: Record<
+		string,
+		{ targetGoals: number; targetMove: boolean; targetSpeed: number; targetSize: number; targetTimeExists: number }
+	> = {
+		easy: { targetGoals: 10, targetMove: false, targetSpeed: 1000, targetSize: 140, targetTimeExists: 4000 },
+		normal: { targetGoals: 15, targetMove: false, targetSpeed: 1500, targetSize: 100, targetTimeExists: 2000 },
+		hard: { targetGoals: 30, targetMove: true, targetSpeed: 6000, targetSize: 70, targetTimeExists: 1000 },
+		very_hard: { targetGoals: 50, targetMove: true, targetSpeed: 8000, targetSize: 50, targetTimeExists: 800 },
+		custom: {
+			targetGoals: cfg.get<number>("targetGoals", 5),
+			targetMove: cfg.get<boolean>("targetMove", false),
+			targetSpeed: cfg.get<number>("targetSpeed", 3000),
+			targetSize: cfg.get<number>("targetSize", 100),
+			targetTimeExists: cfg.get<number>("targetTimeExists", 3000),
+		},
 	};
 
 	let enableExtension = cfg.get<boolean>("enableExtension", true);
@@ -32,12 +48,66 @@ export function activate(context: vscode.ExtensionContext) {
 			}
 		);
 	}
+	let difficulty = (cfg.get<string>("difficulty", "normal") || "normal")
+		.toLowerCase()
+		.replace(/\s+/g, "_")
+		.replace(/-+/g, "_");
 	let idleDelay = clamp(cfg.get<number>("idleTimer", 60000), 1000, 3600000); // ms
 	let targetGoals = clamp(cfg.get<number>("targetGoals", 5), 1, 100);
 	let targetMove = cfg.get<boolean>("targetMove", false);
 	let targetSpeed = clamp(cfg.get<number>("targetSpeed", 3000), 100, 60000); // ms
 	let targetSize = clamp(cfg.get<number>("targetSize", 100), 10, 1000); // px
 	let targetTimeExists = clamp(cfg.get<number>("targetTimeExists", 3000), 0, 60000); // ms
+
+	let prevDifficulty = difficulty;
+
+	async function applyDifficulty() {
+		difficulty = (vscode.workspace.getConfiguration("aimy").get<string>("difficulty", "normal") || "normal")
+			.toLowerCase()
+			.replace(/\s+/g, "_")
+			.replace(/-+/g, "_");
+
+		const preset = DIFFICULTY_PRESETS[difficulty] || DIFFICULTY_PRESETS.normal;
+
+		if (difficulty === "custom") {
+			const cfgNow = vscode.workspace.getConfiguration("aimy");
+			targetGoals = clamp(cfgNow.get<number>("targetGoals", preset.targetGoals), 1, 1000);
+			targetMove = cfgNow.get<boolean>("targetMove", preset.targetMove);
+			targetSpeed = clamp(cfgNow.get<number>("targetSpeed", preset.targetSpeed), 100, 60000);
+			targetSize = clamp(cfgNow.get<number>("targetSize", preset.targetSize), 10, 1000);
+			targetTimeExists = clamp(cfgNow.get<number>("targetTimeExists", preset.targetTimeExists), 0, 60000);
+		} else {
+			// override with preset (in-memory)
+			targetGoals = clamp(preset.targetGoals, 1, 1000);
+			targetMove = preset.targetMove;
+			targetSpeed = clamp(preset.targetSpeed, 100, 60000);
+			targetSize = clamp(preset.targetSize, 10, 1000);
+			targetTimeExists = clamp(preset.targetTimeExists, 0, 60000);
+
+			if (prevDifficulty !== difficulty) {
+				const conf = vscode.workspace.getConfiguration("aimy");
+				if (conf.get<number>("targetGoals") !== preset.targetGoals) {
+					await conf.update("targetGoals", preset.targetGoals, vscode.ConfigurationTarget.Global);
+				}
+				if (conf.get<boolean>("targetMove") !== preset.targetMove) {
+					await conf.update("targetMove", preset.targetMove, vscode.ConfigurationTarget.Global);
+				}
+				if (conf.get<number>("targetSpeed") !== preset.targetSpeed) {
+					await conf.update("targetSpeed", preset.targetSpeed, vscode.ConfigurationTarget.Global);
+				}
+				if (conf.get<number>("targetSize") !== preset.targetSize) {
+					await conf.update("targetSize", preset.targetSize, vscode.ConfigurationTarget.Global);
+				}
+				if (conf.get<number>("targetTimeExists") !== preset.targetTimeExists) {
+					await conf.update("targetTimeExists", preset.targetTimeExists, vscode.ConfigurationTarget.Global);
+				}
+			}
+		}
+
+		prevDifficulty = difficulty;
+	}
+
+	void applyDifficulty();
 
 	let idleTimer: NodeJS.Timeout | undefined;
 	const changeDisposable = vscode.workspace.onDidChangeTextDocument(() => resetTimer());
@@ -51,12 +121,13 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(activeDisposable);
 	context.subscriptions.push(selDisposable);
 
-	const configDisposable = vscode.workspace. onDidChangeConfiguration((e) => {
+	const configDisposable = vscode.workspace.onDidChangeConfiguration((e) => {
 		if (!e.affectsConfiguration("aimy")) {
 			return;
 		}
 		const newCfg = vscode.workspace.getConfiguration("aimy");
 		enableExtension = newCfg.get<boolean>("enableExtension", true);
+		applyDifficulty();
 		idleDelay = clamp(newCfg.get<number>("idleTimer", 60000), 1000, 3600000);
 		targetGoals = clamp(newCfg.get<number>("targetGoals", 5), 1, 100);
 		targetMove = newCfg.get<boolean>("targetMove", false);
@@ -98,6 +169,20 @@ export function activate(context: vscode.ExtensionContext) {
 	let savedTabs: vscode.Tab[] = [];
 	let suppressReopen = false;
 
+	const isTabDirty = (tab: vscode.Tab) => {
+		try {
+			const input = tab.input as any;
+			if (!input || !input.uri) {
+				return false;
+			}
+			const uri: vscode.Uri = input.uri;
+			const doc = vscode.workspace.textDocuments.find((d) => d.uri.toString() === uri.toString());
+			return !!(doc && doc.isDirty);
+		} catch {
+			return false;
+		}
+	};
+
 	function resetTimer() {
 		if (idleTimer) {
 			clearTimeout(idleTimer);
@@ -126,7 +211,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 	resetTimer();
 
-	function showGame() {
+	async function showGame() {
 		if (gameActive && !suppressReopen) {
 			return;
 		}
@@ -142,12 +227,37 @@ export function activate(context: vscode.ExtensionContext) {
 
 		if (closeWorkspaceOnGameStart) {
 			// Save currently open tabs
-			savedTabs = vscode.window.tabGroups.all.flatMap((group) => group.tabs);
-			// Close all tabs
-			vscode.commands.executeCommand("workbench.action.closeAllEditors");
+			const allTabs = vscode.window.tabGroups.all.flatMap((group) => group.tabs);
+
+			const tabsToClose = allTabs.filter((t) => {
+				const input = t.input as any;
+				if (!input || !input.uri) {
+					return false;
+				}
+				return !isTabDirty(t);
+			});
+
+			savedTabs = tabsToClose.slice();
+
+			for (const tab of tabsToClose) {
+				try {
+					if (
+						(vscode.window as any).tabGroups &&
+						typeof (vscode.window as any).tabGroups.close === "function"
+					) {
+						await (vscode.window as any).tabGroups.close(tab);
+					} else {
+						const input = tab.input as any;
+						if (input && input.uri) {
+							await vscode.window.showTextDocument(input.uri, { preview: false });
+							await vscode.commands.executeCommand("workbench.action.closeActiveEditor");
+						}
+					}
+				} catch (err) {
+				}
+			}
 		}
 
-		// Create fullscreen game webview
 		gamePanel = vscode.window.createWebviewPanel("aimyGame", "AimY - Hit the Targets!", vscode.ViewColumn.One, {
 			enableScripts: true,
 			retainContextWhenHidden: true,
@@ -263,8 +373,18 @@ export function activate(context: vscode.ExtensionContext) {
 			// Restore previously open tabs
 			setTimeout(() => {
 				savedTabs.forEach((tab) => {
-					if (tab.input && typeof tab.input === "object" && tab.input !== null && (tab.input as any).uri) {
-						vscode.window.showTextDocument((tab.input as any).uri, { preview: false });
+					try {
+						if (
+							tab.input &&
+							typeof tab.input === "object" &&
+							tab.input !== null &&
+							(tab.input as any).uri
+						) {
+							vscode.window.showTextDocument((tab.input as any).uri, { preview: false });
+						}
+					} catch (err) {
+						// ignore restore errors
+						console.error("AimY: failed to restore tab", err);
 					}
 				});
 				savedTabs = [];

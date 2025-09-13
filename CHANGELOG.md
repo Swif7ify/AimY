@@ -74,6 +74,16 @@ All notable changes to AimY will be documented in this file.
 
 -   Added `aimy.closeWorkspaceOnGameStart` setting to control whether open editors are closed when a game starts. When disabled, the extension will not close editors and will instead return focus to the game if you switch tabs.
 
+## [0.0.12] - 2025-09-13
+
+### Added
+
+-   Difficulty presets (easy, normal, hard, very hard, custom). Selecting a preset applies balanced game parameter sets (targets, size, movement, speed).
+
+### Changed
+
+-   Safer workspace handling: when `aimy.closeWorkspaceOnGameStart` is enabled, the extension now only closes editors that are not dirty (no unsaved changes). Dirty editors are left open to avoid "Do you want to save changes?" prompts; only the tabs actually closed are restored after the game.
+
 ### Features
 
 -   🎯 Interactive target shooting game

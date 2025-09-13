@@ -68,6 +68,18 @@
 					"maximum": 60000,
 					"description": "How long (ms) a target exists before counting as a miss. Set 0 to disable."
 				},
+				"aimy.difficulty": {
+					"type": "string",
+					"enum": [
+						"easy",
+						"normal",
+						"hard",
+						"very hard",
+						"custom"
+					],
+					"default": "normal",
+					"description": "Choose a difficulty preset or 'custom' to use your own settings."
+				},
 				"aimy.statsFormat": {
 					"type": "string",
 					"enum": [
