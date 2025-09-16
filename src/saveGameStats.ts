@@ -71,7 +71,6 @@ export async function saveGameStats(context: vscode.ExtensionContext, stats: any
 			const csvPath = path.join(outDir, "aimy-stats.csv");
 			const exists = fs.existsSync(csvPath);
 
-			// Updated CSV headers to include all settings
 			const header = [
 				// Game stats
 				"timestamp",
@@ -79,8 +78,8 @@ export async function saveGameStats(context: vscode.ExtensionContext, stats: any
 				"time",
 				"accuracy",
 				"bestStreak",
-				"gameMode", // Add gameMode to stats (passed from webview)
-
+				"gameMode",
+				
 				// Core settings
 				"difficulty",
 				"targetGoals",
@@ -90,7 +89,7 @@ export async function saveGameStats(context: vscode.ExtensionContext, stats: any
 				"targetTimeExists",
 
 				// Game mode settings
-				"configuredGameMode", // The setting value
+				"configuredGameMode", 
 				"timeFrenzyDuration",
 				"hydraMode",
 				"hydraTargetCount",
@@ -113,7 +112,7 @@ export async function saveGameStats(context: vscode.ExtensionContext, stats: any
 				stats.time ?? "",
 				stats.accuracy ?? "",
 				stats.bestStreak ?? "",
-				stats.gameMode ?? "", // From webview
+				stats.gameMode ?? "",
 
 				// Core settings
 				settingsObj.difficulty,
@@ -159,7 +158,6 @@ export async function saveGameStats(context: vscode.ExtensionContext, stats: any
 			);
 			return csvPath;
 		} else {
-			// JSON format includes all settings in the settings object
 			const out = Object.assign({}, stats, { settings: settingsObj });
 			const name = `aimy-stats-${new Date().toISOString().replace(/[:.]/g, "-")}.json`;
 			const filePath = path.join(outDir, name);
