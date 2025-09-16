@@ -29,6 +29,17 @@ export function activate(context: vscode.ExtensionContext) {
 		},
 	};
 
+	let gameMode = (cfg.get<string>("gameMode", "Target_Rush") || "Target_Rush")
+		.toLowerCase()
+		.replace(/\s+/g, "_")
+		.replace(/-+/g, "_");
+	let timeFrenzyDuration = clamp(cfg.get<number>("timeFrenzyDuration", 60000), 1000, 3600000);
+	let hydraTargetCount = clamp(cfg.get<number>("hydraTargetCount", 20), 1, 1000);
+	let hydraTotalTime = clamp(cfg.get<number>("hydraTotalTime", 60000), 1000, 3600000);
+	let hydraMode = (cfg.get<string>("hydraMode", "Target Count") || "Target Count")
+		.toLowerCase()
+		.replace(/\s+/g, "_")
+		.replace(/-+/g, "_");
 	let enableExtension = cfg.get<boolean>("enableExtension", true);
 	let enableSoundEffects = cfg.get<boolean>("enableSoundEffects", true);
 	let soundVolume = clamp(cfg.get<number>("soundVolume", 80), 0, 100);
@@ -48,7 +59,7 @@ export function activate(context: vscode.ExtensionContext) {
 			}
 		);
 	}
-	let difficulty = (cfg.get<string>("difficulty", "normal") || "normal")
+	let difficulty = (cfg.get<string>("difficulty", "Normal") || "Normal")
 		.toLowerCase()
 		.replace(/\s+/g, "_")
 		.replace(/-+/g, "_");
@@ -62,14 +73,14 @@ export function activate(context: vscode.ExtensionContext) {
 	let prevDifficulty = difficulty;
 
 	async function applyDifficulty() {
-		difficulty = (vscode.workspace.getConfiguration("aimy").get<string>("difficulty", "normal") || "normal")
+		difficulty = (vscode.workspace.getConfiguration("aimy").get<string>("difficulty", "Normal") || "Normal")
 			.toLowerCase()
 			.replace(/\s+/g, "_")
 			.replace(/-+/g, "_");
 
 		const preset = DIFFICULTY_PRESETS[difficulty] || DIFFICULTY_PRESETS.normal;
 
-		if (difficulty === "custom") {
+		if (difficulty === "Custom") {
 			const cfgNow = vscode.workspace.getConfiguration("aimy");
 			targetGoals = clamp(cfgNow.get<number>("targetGoals", preset.targetGoals), 1, 1000);
 			targetMove = cfgNow.get<boolean>("targetMove", preset.targetMove);
@@ -139,6 +150,18 @@ export function activate(context: vscode.ExtensionContext) {
 		enableStatsSave = newCfg.get<boolean>("enableStatsSave", true);
 		enableEffects = newCfg.get<boolean>("enableEffects", true);
 		closeWorkspaceOnGameStart = newCfg.get<boolean>("closeWorkspaceOnGameStart", true);
+
+		gameMode = (newCfg.get<string>("gameMode", "Target_Rush") || "Target_Rush")
+			.toLowerCase()
+			.replace(/\s+/g, "_")
+			.replace(/-+/g, "_");
+		timeFrenzyDuration = clamp(newCfg.get<number>("timeFrenzyDuration", 60000), 1000, 3600000);
+		hydraTargetCount = clamp(newCfg.get<number>("hydraTargetCount", 20), 1, 1000);
+		hydraTotalTime = clamp(newCfg.get<number>("hydraTotalTime", 60000), 1000, 3600000);
+		hydraMode = (newCfg.get<string>("hydraMode", "Target Count") || "Target Count")
+			.toLowerCase()
+			.replace(/\s+/g, "_")
+			.replace(/-+/g, "_");
 		resetTimer();
 	});
 	context.subscriptions.push(configDisposable);
@@ -253,8 +276,7 @@ export function activate(context: vscode.ExtensionContext) {
 							await vscode.commands.executeCommand("workbench.action.closeActiveEditor");
 						}
 					}
-				} catch (err) {
-				}
+				} catch (err) {}
 			}
 		}
 
@@ -311,6 +333,11 @@ export function activate(context: vscode.ExtensionContext) {
 			soundVolume,
 			enableEffects,
 			isLight: isLightTheme,
+			gameMode,
+			timeFrenzyDuration,
+			hydraTargetCount,
+			hydraTotalTime,
+			hydraMode,
 		});
 
 		// Handle messages from webview
@@ -327,6 +354,7 @@ export function activate(context: vscode.ExtensionContext) {
 								time: message.time,
 								accuracy: message.accuracy,
 								bestStreak: message.bestStreak,
+								gameMode: message.gameMode,
 								timestamp: new Date().toISOString(),
 							});
 						}

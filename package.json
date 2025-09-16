@@ -35,12 +35,31 @@
 					"maximum": 3600000,
 					"description": "Idle delay in milliseconds before the game auto-starts."
 				},
+				"aimy.difficulty": {
+					"type": "string",
+					"enum": [
+						"Easy",
+						"Normal",
+						"Hard",
+						"Very Hard",
+						"Custom"
+					],
+					"default": "Normal",
+					"description": "Choose a difficulty preset or 'Custom' to use your own settings."
+				},
 				"aimy.targetGoals": {
 					"type": "number",
 					"default": 5,
 					"minimum": 1,
 					"maximum": 1000,
 					"description": "Number of targets to hit to complete the game."
+				},
+				"aimy.targetSize": {
+					"type": "number",
+					"default": 100,
+					"minimum": 10,
+					"maximum": 1000,
+					"description": "Target diameter in pixels."
 				},
 				"aimy.targetMove": {
 					"type": "boolean",
@@ -54,13 +73,6 @@
 					"maximum": 60000,
 					"description": "Target movement speed (ms per move)."
 				},
-				"aimy.targetSize": {
-					"type": "number",
-					"default": 100,
-					"minimum": 10,
-					"maximum": 1000,
-					"description": "Target diameter in pixels."
-				},
 				"aimy.targetTimeExists": {
 					"type": "number",
 					"default": 3000,
@@ -68,17 +80,67 @@
 					"maximum": 60000,
 					"description": "How long (ms) a target exists before counting as a miss. Set 0 to disable."
 				},
-				"aimy.difficulty": {
+				"aimy.gameMode": {
 					"type": "string",
+					"default": "Target Rush",
 					"enum": [
-						"easy",
-						"normal",
-						"hard",
-						"very hard",
-						"custom"
+						"Target Rush",
+						"Time Frenzy",
+						"Hydra Targets"
 					],
-					"default": "normal",
-					"description": "Choose a difficulty preset or 'custom' to use your own settings."
+					"description": "Game mode: Target Rush (classic), Time Frenzy (fixed time, score targets), Hydra Targets (3 simultaneous targets, fixed time or fixed target count)."
+				},
+				"aimy.timeFrenzyDuration": {
+					"type": "number",
+					"default": 60000,
+					"minimum": 1000,
+					"maximum": 3600000,
+					"description": "Duration in ms for Time Frenzy mode."
+				},
+				"aimy.hydraMode": {
+					"type": "string",
+					"default": "Target Count",
+					"enum": [
+						"Target Count",
+						"Timed"
+					],
+					"description": "Hydra Targets end condition: 'Target Count' (hit X targets to win) or 'Timed' (hit as many as possible in Y seconds). Applies only when gameMode = 'Hydra Targets'."
+				},
+				"aimy.hydraTargetCount": {
+					"type": "number",
+					"default": 20,
+					"minimum": 1,
+					"maximum": 1000,
+					"description": "Total targets to spawn for Hydra Targets when using target-count mode."
+				},
+				"aimy.hydraTotalTime": {
+					"type": "number",
+					"default": 60000,
+					"minimum": 1000,
+					"maximum": 3600000,
+					"description": "Total time in ms for Hydra Targets when using timed mode."
+				},
+				"aimy.enableSoundEffects": {
+					"type": "boolean",
+					"default": true,
+					"description": "Enable/disable hit/miss sound effects in the game."
+				},
+				"aimy.soundVolume": {
+					"type": "number",
+					"default": 80,
+					"minimum": 0,
+					"maximum": 100,
+					"description": "Volume for sound effects (0-100)."
+				},
+				"aimy.enableEffects": {
+					"type": "boolean",
+					"default": true,
+					"description": "Enable visual effects like particles and hit/miss animations."
+				},
+				"aimy.enableStatsSave": {
+					"type": "boolean",
+					"default": true,
+					"description": "Enable/disable saving game stats to files."
 				},
 				"aimy.statsFormat": {
 					"type": "string",
@@ -94,32 +156,10 @@
 					"default": "",
 					"description": "Directory where AimY saves stats JSON files. Leave empty to use the extension storage folder."
 				},
-				"aimy.enableSoundEffects": {
-					"type": "boolean",
-					"default": true,
-					"description": "Enable/disable hit/miss sound effects in the game."
-				},
-				"aimy.soundVolume": {
-					"type": "number",
-					"default": 80,
-					"minimum": 0,
-					"maximum": 100,
-					"description": "Volume for sound effects (0-100)."
-				},
-				"aimy.enableStatsSave": {
-					"type": "boolean",
-					"default": true,
-					"description": "Enable/disable saving game stats to files."
-				},
-				"aimy.enableEffects": {
-					"type": "boolean",
-					"default": true,
-					"description": "Enable visual effects like particles and hit/miss animations."
-				},
 				"aimy.closeWorkspaceOnGameStart": {
 					"type": "boolean",
 					"default": true,
-					"description": "Close all open editors when the game starts and restore them after completion."
+					"description": "Close all open editors when the game starts and restore them after completion. Dirty (unsaved) editors are not closed to avoid save prompts."
 				}
 			}
 		}

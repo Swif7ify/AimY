@@ -7,6 +7,7 @@
 ![Rating](https://img.shields.io/visual-studio-marketplace/r/EarlRomeoOrdovez.aimy)
 
 <!-- Tech stack -->
+
 ![Three.js](https://img.shields.io/badge/Three.js-3D-6E40C9?logo=three.js&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?logo=typescript&logoColor=white)
 ![VS Code API](https://img.shields.io/badge/VS%20Code%20API-Latest-007ACC?logo=visualstudiocode&logoColor=white)
@@ -63,30 +64,68 @@ The extension works out of the box with sensible defaults. You can also:
 
 All settings are available in VS Code settings under the "AimY" section:
 
-| Setting                          | Default  | Description                                                                 |
-| -------------------------------- | -------- | --------------------------------------------------------------------------- |
-| `aimy.enableExtension`           | `true`   | Enable/disable automatic game triggering                                    |
-| `aimy.idleTimer`                 | `60000`  | Idle time in milliseconds before game starts                                |
-| `aimy.targetGoals`               | `5`      | Targets required to complete a session                                      |
-| `aimy.targetSize`                | `100`    | Target diameter in pixels                                                   |
-| `aimy.targetMove`                | `false`  | Enable moving targets                                                       |
-| `aimy.targetSpeed`               | `3000`   | Movement speed (px/s)                                                       |
-| `aimy.targetTimeExists`          | `3000`   | How long a target exists before counting as a miss (0 = disabled)           |
-| `aimy.difficulty`                | `"normal"` | Preset difficulty: `easy`, `normal`, `hard`, `very hard`, `custom`. Choosing a preset applies tuned game parameters; `custom` uses your individual settings. |
-| `aimy.statsFormat`               | `"json"` | Save format for stats: `"json"` (one file per run) or `"csv"` (append rows) |
-| `aimy.statsDirectory`            | `""`     | Directory to save stats (empty = extension storage)                         |
-| `aimy.enableSoundEffects`        | `true`   | Enable hit/miss sounds                                                      |
-| `aimy.soundVolume`               | `80`     | Sound volume (0–100)                                                        |
-| `aimy.enableEffects`             | `true`   | Enable visual particles                                                     |
-| `aimy.closeWorkspaceOnGameStart` | `true`   | Control whether open editors are closed when a game starts       
+### General Settings
+
+| Setting                | Default | Description                                  |
+| ---------------------- | ------- | -------------------------------------------- |
+| `aimy.enableExtension` | `true`  | Enable/disable automatic game triggering     |
+| `aimy.idleTimer`       | `60000` | Idle time in milliseconds before game starts |
+
+### Gameplay Settings
+
+| Setting                 | Default    | Description                                                                                                                                                  |
+| ----------------------- | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `aimy.difficulty`       | `"Normal"` | Preset difficulty: `Easy`, `Normal`, `Hard`, `Very Hard`, `Custom`. Choosing a preset applies tuned game parameters; `Custom` uses your individual settings. |
+| `aimy.targetGoals`      | `5`        | Targets required to complete a session                                                                                                                       |
+| `aimy.targetSize`       | `100`      | Target diameter in pixels                                                                                                                                    |
+| `aimy.targetMove`       | `false`    | Enable moving targets                                                                                                                                        |
+| `aimy.targetSpeed`      | `3000`     | Movement speed (ms per move)                                                                                                                                 |
+| `aimy.targetTimeExists` | `3000`     | How long a target exists before counting as a miss (0 = disabled)                                                                                            |
+
+### Game Mode Settings
+
+| Setting                   | Default          | Description                                                                                                                                                         |
+| ------------------------- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `aimy.gameMode`           | `"Target Rush"`  | Game mode: `Target Rush` (classic), `Time Frenzy` (fixed time, unlimited targets), `Hydra Targets` (3 simultaneous targets).                                        |
+| `aimy.timeFrenzyDuration` | `60000`          | Duration in ms for Time Frenzy mode                                                                                                                                 |
+| `aimy.hydraMode`          | `"Target Count"` | Hydra Targets end condition: `Target Count` (hit X targets to win) or `Timed` (hit as many as possible in Y seconds). Only applies when gameMode = 'Hydra Targets'. |
+| `aimy.hydraTargetCount`   | `20`             | Total targets to spawn for Hydra Targets when using target-count mode                                                                                               |
+| `aimy.hydraTotalTime`     | `60000`          | Total time in ms for Hydra Targets when using timed mode                                                                                                            |
+
+### Audio & Visual Settings
+
+| Setting                   | Default | Description                            |
+| ------------------------- | ------- | -------------------------------------- |
+| `aimy.enableSoundEffects` | `true`  | Enable hit/miss sounds                 |
+| `aimy.soundVolume`        | `80`    | Sound volume (0–100)                   |
+| `aimy.enableEffects`      | `true`  | Enable visual particles and animations |
+
+### Stats & Workspace Settings
+
+| Setting                          | Default  | Description                                                                                                                                                     |
+| -------------------------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `aimy.enableStatsSave`           | `true`   | Enable/disable saving game stats to files                                                                                                                       |
+| `aimy.statsFormat`               | `"json"` | Save format: `"json"` (one file per run) or `"csv"` (append rows)                                                                                               |
+| `aimy.statsDirectory`            | `""`     | Directory to save stats (empty = extension storage)                                                                                                             |
+| `aimy.closeWorkspaceOnGameStart` | `true`   | When enabled, non‑dirty editors (no unsaved changes) are closed on game start and restored after completion. Dirty editors are left open to avoid save prompts. |
 
 ### Difficulty presets
+
 Choose `aimy.difficulty` to quickly switch sets of parameters:
-- easy — fewer, larger, slower targets (good warmup)
-- normal — balanced default
-- hard — more, faster, smaller targets
-- very hard — extreme values for advanced training
-- custom — use the individual `aimy.*` settings you configured           |
+
+-   easy — fewer, larger, slower targets (good warmup)
+-   normal — balanced default
+-   hard — more, faster, smaller targets
+-   very hard — extreme values for advanced training
+-   custom — use the individual `aimy.*` settings you configured |
+
+### Game Mode Details
+
+-   **Target Rush**: Classic mode - hit X targets to complete
+-   **Time Frenzy**: Race against the clock - hit as many targets as possible in 60 seconds (configurable)
+-   **Hydra Targets**: Face 3 simultaneous targets with two completion modes:
+    -   _Target Count_: Hit 20 targets total (configurable) with 3 always on screen
+    -   _Timed_: Hit as many as possible in 60 seconds (configurable) with 3 always on screen
 
 ## Why AimY?
 

@@ -9,17 +9,28 @@ export function getGameHTML(opts?: {
 	soundVolume?: number;
 	enableEffects?: boolean;
 	isLight?: boolean;
+	gameMode?: string;
+	timeFrenzyDuration?: number;
+	hydraTargetCount?: number;
+	hydraTotalTime?: number;
+	hydraMode?: string;
 }): string {
+	const GAME_MODE = opts?.gameMode || "target_rush"; // normalized: target_rush, time_frenzy, hydra_targets
 	const ff = (opts?.fontFamily || "Segoe UI").replace(/["`]/g, "");
 	const IS_LIGHT = !!opts?.isLight;
 	const TARGET_GOALS = opts?.targetGoals ?? 5;
 	const DEFAULT_SIZE = opts?.targetSize ?? 100;
 	const DEFAULT_MOVE = opts?.targetMove ?? false;
 	const DEFAULT_SPEED = opts?.targetSpeed ?? 3000;
-	const TIME_EXISTS = opts?.targetTimeExists ?? 3000;
+	const TIME_EXISTS = GAME_MODE === "hydra_targets" ? 0 : opts?.targetTimeExists ?? 3000;
 	const SOUND_EFFECTS = opts?.enableSoundEffects ?? true;
 	const SOUND_VOLUME = opts?.soundVolume ?? 80;
 	const ENABLE_EFFECTS = opts?.enableEffects ?? true;
+
+	const TIME_FRENZY_DURATION = opts?.timeFrenzyDuration ?? 60000;
+	const HYDRA_TARGET_COUNT = opts?.hydraTargetCount ?? 20;
+	const HYDRA_TOTAL_TIME = opts?.hydraTotalTime ?? 60000;
+	const HYDRA_MODE = opts?.hydraMode || "target_count"; // normalized: target_count, timed
 
 	// theme-aware colors for HUD and effects
 	const TARGET_WHITE = IS_LIGHT ? "#111111" : "#ffffff";
@@ -231,13 +242,41 @@ export function getGameHTML(opts?: {
             osc.stop(now + 0.20);
         }
 
+        // Add to the webview JavaScript section - replace the existing game logic
         let score = 0;
         let shots = 0;
         let streak = 0;
         let bestStreak = 0;
         let targetCount = ${TARGET_GOALS};
         let gameStartTime = Date.now();
-        let currentTarget = null;
+        let gameEndTime = null;
+        let currentTargets = []; // Changed to array for hydra mode
+        let gameTimeLimit = 0;
+        let gameTargetLimit = 0;
+
+        // Game mode setup
+        const GAME_MODE = "${GAME_MODE}";
+        const HYDRA_MODE = "${HYDRA_MODE}";
+        if (GAME_MODE === "time_frenzy") {
+            gameTimeLimit = ${TIME_FRENZY_DURATION};
+            targetCount = 999; // unlimited targets in time mode
+            document.getElementById('targetTotal').textContent = '∞';
+        } else if (GAME_MODE === "hydra_targets") {
+            if (HYDRA_MODE === "timed") {
+                gameTimeLimit = ${HYDRA_TOTAL_TIME};
+                targetCount = 999; // unlimited targets in timed hydra mode
+                document.getElementById('targetTotal').textContent = '∞';
+            } else {
+                // target_count mode
+                gameTimeLimit = 0; // no time limit
+                gameTargetLimit = ${HYDRA_TARGET_COUNT};
+                targetCount = gameTargetLimit;
+                document.getElementById('targetTotal').textContent = gameTargetLimit;
+            }
+        } else {
+            // target_rush - default behavior
+            document.getElementById('targetTotal').textContent = targetCount;
+        }
 
         const gameArea = document.getElementById('gameArea');
         const scoreElement = document.getElementById('score');
@@ -245,31 +284,24 @@ export function getGameHTML(opts?: {
         const accuracyElement = document.getElementById('accuracy');
         const streakElement = document.getElementById('streak');
 
-        function createParticles() {
-            if (!ENABLE_EFFECTS) return;
-            const particlesContainer = document.getElementById('particles');
-            for (let i = 0; i < 15; i++) {
-                setTimeout(() => {
-                    const particle = document.createElement('div');
-                    particle.className = 'floating-particles';
-                    particle.style.left = Math.random() * 100 + '%';
-                    particle.style.animationDelay = Math.random() * 6 + 's';
-                    particle.style.animationDuration = (4 + Math.random() * 4) + 's';
-                    particlesContainer.appendChild(particle);
-                    setTimeout(() => particle.remove(), 8000);
-                }, i * 400);
-            }
+        // Game timer for time-limited modes
+        let gameTimer = null;
+        if (gameTimeLimit > 0) {
+            gameEndTime = gameStartTime + gameTimeLimit;
+            gameTimer = setInterval(() => {
+                const remaining = Math.max(0, Math.ceil((gameEndTime - Date.now()) / 1000));
+                timerElement.textContent = remaining + 's left';
+                if (remaining <= 0) {
+                    gameComplete();
+                }
+            }, 100);
+        } else {
+            // Regular timer for target_rush
+            setInterval(() => {
+                const elapsed = Math.floor((Date.now() - gameStartTime) / 1000);
+                timerElement.textContent = elapsed;
+            }, 100);
         }
-
-        if(ENABLE_EFFECTS) {
-            setInterval(createParticles, 3000);
-            createParticles();
-        }
-
-        setInterval(() => {
-            const elapsed = Math.floor((Date.now() - gameStartTime) / 1000);
-            timerElement.textContent = elapsed;
-        }, 100);
 
         const w = window.innerWidth;
         const h = window.innerHeight;
@@ -327,7 +359,6 @@ export function getGameHTML(opts?: {
         }
 
         function createTarget() {
-            if (currentTarget) scene.remove(currentTarget);
             const size = ${DEFAULT_SIZE};
             const target = makeTarget(size);
             const margin = size;
@@ -335,24 +366,53 @@ export function getGameHTML(opts?: {
             const cy = Math.random() * (window.innerHeight - margin * 2) + margin;
             placeGroupAtScreenPos(target, cx, cy);
             
-            target.userData.moveSpeed = ${DEFAULT_MOVE} ? ${DEFAULT_SPEED} / 1000 : 0;
+            // Disable movement for hydra mode, use normal movement settings for other modes
+            const shouldMove = GAME_MODE === "hydra_targets" ? false : ${DEFAULT_MOVE};
+            target.userData.moveSpeed = shouldMove ? ${DEFAULT_SPEED} / 1000 : 0;
             target.userData.moveDirection = {
                 x: (Math.random() - 0.5) * 2,
                 y: (Math.random() - 0.5) * 2
             };
             target.userData.startTime = Date.now();
+            target.userData.id = Date.now() + Math.random(); // unique ID
             
             scene.add(target);
-            currentTarget = target;
+            
+            if (GAME_MODE === "hydra_targets") {
+                currentTargets.push(target);
+            } else {
+                if (currentTargets[0]) scene.remove(currentTargets[0]);
+                currentTargets = [target];
+            }
             
             if (${TIME_EXISTS} > 0) {
                 setTimeout(() => {
-                    if (currentTarget === target) {
+                    const targetIndex = currentTargets.findIndex(t => t.userData.id === target.userData.id);
+                    if (targetIndex !== -1) {
                         streak = 0;
                         spawnMissEffect(window.innerWidth / 2, window.innerHeight / 2);
-                        createTarget();
+                        scene.remove(target);
+                        currentTargets.splice(targetIndex, 1);
+                        
+                        if (GAME_MODE === "hydra_targets" && currentTargets.length < 3) {
+                            createTarget();
+                        } else if (GAME_MODE !== "hydra_targets") {
+                            createTarget();
+                        }
                     }
                 }, ${TIME_EXISTS});
+            }
+        }
+
+        function initializeGame() {
+            if (GAME_MODE === "hydra_targets") {
+                // Create 3 targets for hydra mode
+                for (let i = 0; i < 3; i++) {
+                    setTimeout(() => createTarget(), i * 200);
+                }
+            } else {
+                // Single target for other modes
+                createTarget();
             }
         }
 
@@ -363,56 +423,73 @@ export function getGameHTML(opts?: {
             return { x: canvasX - rect.width / 2, y: rect.height / 2 - canvasY };
         }
 
-        function computePointsFromScreen(clientX, clientY) {
-            if (!currentTarget) return { hit: false, points: 0 };
-            const world = screenToWorld(clientX, clientY);
-            const localClick = new THREE.Vector3(world.x, world.y, 0);
-            const localPoint = currentTarget.worldToLocal(localClick);
-            const dist = Math.hypot(localPoint.x, localPoint.y);
-            const radii = currentTarget.userData.radii || [];
-            for (let j = radii.length - 1; j >= 0; j--) {
-                const outer = radii[j];
-                const inner = (j + 1 < radii.length) ? radii[j + 1] : 0;
-                if (dist <= outer && dist >= inner) return { hit: true, points: 1 };
+        function computePointsFromClick(clientX, clientY) {
+            let bestHit = { hit: false, points: 0, target: null };
+            
+            for (const target of currentTargets) {
+                const world = screenToWorld(clientX, clientY);
+                const localClick = new THREE.Vector3(world.x, world.y, 0);
+                const localPoint = target.worldToLocal(localClick);
+                const dist = Math.hypot(localPoint.x, localPoint.y);
+                const radii = target.userData.radii || [];
+                
+                for (let j = radii.length - 1; j >= 0; j--) {
+                    const outer = radii[j];
+                    const inner = (j + 1 < radii.length) ? radii[j + 1] : 0;
+                    if (dist <= outer && dist >= inner) {
+                        bestHit = { hit: true, points: 1, target };
+                        break;
+                    }
+                }
+                if (bestHit.hit) break; // Take first hit
             }
-            return { hit: false, points: 0 };
+            
+            return bestHit;
         }
 
         function onPointerDown(e) {
             shots++;
             if (SOUND_EFFECTS && audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
-            mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
-            mouse.y = - (e.clientY / window.innerHeight) * 2 + 1;
-            raycaster.setFromCamera(mouse, camera);
-            const intersects = raycaster.intersectObjects(scene.children, true);
-            const hitResult = computePointsFromScreen(e.clientX, e.clientY);
-            let hitTarget = false;
-            if (hitResult.hit) {
-                hitTarget = true;
+            
+            const hitResult = computePointsFromClick(e.clientX, e.clientY);
+            
+            if (hitResult.hit && hitResult.target) {
                 const points = hitResult.points;
                 score += points;
                 streak++;
                 scoreElement.textContent = score;
+                
                 if (ENABLE_EFFECTS) spawnHitEffect(e.clientX, e.clientY, points);
                 if (SOUND_EFFECTS) playHitSound();
-                let explosionPos = null;
-                if (intersects.length > 0) {
-                    const hit = intersects.find(i => {
-                        let o = i.object;
-                        while (o) {
-                            if (o.name === 'target') return true;
-                            o = o.parent;
-                        }
-                        return false;
-                    });
-                    if (hit) explosionPos = hit.point;
+                
+                // Remove hit target
+                const targetIndex = currentTargets.findIndex(t => t.userData.id === hitResult.target.userData.id);
+                if (targetIndex !== -1) {
+                    scene.remove(hitResult.target);
+                    currentTargets.splice(targetIndex, 1);
+                    
+                    // Create explosion effect
+                    createHitExplosion(hitResult.target.position);
                 }
-                if (!explosionPos && currentTarget) explosionPos = new THREE.Vector3(currentTarget.position.x, currentTarget.position.y, 0);
-                if (explosionPos) createHitExplosion(explosionPos);
-                if (score >= targetCount) gameComplete();
-                else createTarget();
-            }
-            if (!hitTarget) {
+                
+                // Win / end conditions
+                if (GAME_MODE === "target_rush" && score >= targetCount) {
+                    gameComplete();
+                } else if (GAME_MODE === "hydra_targets" && HYDRA_MODE === "target_count" && score >= gameTargetLimit) {
+                    gameComplete();
+                } else {
+                    // Spawn replacements:
+                    // - Hydra mode (both timed and target-count): keep 3 targets on screen
+                    // - Other modes: spawn a single new target as before
+                    if (GAME_MODE === "hydra_targets") {
+                        while (currentTargets.length < 3) {
+                            createTarget();
+                        }
+                    } else {
+                        createTarget();
+                    }
+                }
+            } else {
                 streak = 0;
                 spawnMissEffect(e.clientX, e.clientY);
             }
@@ -490,35 +567,49 @@ export function getGameHTML(opts?: {
         function gameComplete() {
             const finalTime = Math.floor((Date.now() - gameStartTime) / 1000);
             const finalAccuracy = shots > 0 ? Math.round((score / shots) * 100) : 100;
-            if (currentTarget) scene.remove(currentTarget);
-            vscode.postMessage({ command: 'gameComplete', score: score, time: finalTime, accuracy: finalAccuracy, bestStreak: bestStreak });
+            
+            if (gameTimer) clearInterval(gameTimer);
+            currentTargets.forEach(target => scene.remove(target));
+            currentTargets = [];
+            
+            vscode.postMessage({ 
+                command: 'gameComplete', 
+                score: score, 
+                time: finalTime, 
+                accuracy: finalAccuracy, 
+                bestStreak: bestStreak,
+                gameMode: GAME_MODE
+            });
             window.removeEventListener('pointerdown', onPointerDown);
         }
 
         function animate() {
             requestAnimationFrame(animate);
             
-            if (currentTarget && ${DEFAULT_MOVE}) {
+            // Update moving targets - skip movement entirely for hydra mode
+            if (${DEFAULT_MOVE} && GAME_MODE !== "hydra_targets") {
                 const deltaTime = 0.016;
-                const speed = currentTarget.userData.moveSpeed || 0;
-                const dir = currentTarget.userData.moveDirection || { x: 0, y: 0 };
-                
-                currentTarget.position.x += dir.x * speed * deltaTime * 60;
-                currentTarget.position.y += dir.y * speed * deltaTime * 60;
-                
-                const bounds = {
-                    left: -window.innerWidth / 2 + 50,
-                    right: window.innerWidth / 2 - 50,
-                    top: window.innerHeight / 2 - 50,
-                    bottom: -window.innerHeight / 2 + 50
-                };
-                
-                if (currentTarget.position.x <= bounds.left || currentTarget.position.x >= bounds.right) {
-                    currentTarget.userData.moveDirection.x *= -1;
-                }
-                if (currentTarget.position.y <= bounds.bottom || currentTarget.position.y >= bounds.top) {
-                    currentTarget.userData.moveDirection.y *= -1;
-                }
+                currentTargets.forEach(target => {
+                    const speed = target.userData.moveSpeed || 0;
+                    const dir = target.userData.moveDirection || { x: 0, y: 0 };
+                    
+                    target.position.x += dir.x * speed * deltaTime * 60;
+                    target.position.y += dir.y * speed * deltaTime * 60;
+                    
+                    const bounds = {
+                        left: -window.innerWidth / 2 + 50,
+                        right: window.innerWidth / 2 - 50,
+                        top: window.innerHeight / 2 - 50,
+                        bottom: -window.innerHeight / 2 + 50
+                    };
+                    
+                    if (target.position.x <= bounds.left || target.position.x >= bounds.right) {
+                        target.userData.moveDirection.x *= -1;
+                    }
+                    if (target.position.y <= bounds.bottom || target.position.y >= bounds.top) {
+                        target.userData.moveDirection.y *= -1;
+                    }
+                });
             }
             
             renderer.render(scene, camera);
@@ -539,7 +630,7 @@ export function getGameHTML(opts?: {
         window.addEventListener('pointerdown', onPointerDown, false);
 
         animate();
-        createTarget();
+        initializeGame();
         updateStats();
     </script>
 </body>

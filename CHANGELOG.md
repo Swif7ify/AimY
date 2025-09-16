@@ -2,18 +2,84 @@
 
 All notable changes to AimY will be documented in this file.
 
-## [0.0.1] - 2025-01-05
+## [0.0.13] - 2025-09-16
 
 ### Added
 
--   Initial release of AimY
--   Automatic idle detection with configurable timer
--   Fullscreen target practice game
--   Customizable target behavior (size, movement, count)
--   Performance tracking with JSON/CSV export
--   Status bar toggle for quick enable/disable
--   Complete workspace restoration after games
--   Comprehensive settings configuration
+-   **Game Modes**: Three distinct game modes now available:
+    -   **Target Rush** (classic): Hit X targets to complete the session
+    -   **Time Frenzy**: Hit as many targets as possible within a time limit (60 seconds default)
+    -   **Hydra Targets**: 3 simultaneous targets with two sub-modes:
+        -   Target Count mode: Hit X targets total (20 default) with 3 always on screen
+        -   Timed mode: Hit as many as possible within time limit with 3 always on screen
+-   **Enhanced Stats Tracking**: CSV and JSON exports now include comprehensive game data:
+    -   All game mode settings (timeFrenzyDuration, hydraMode, hydraTargetCount, etc.)
+    -   Complete difficulty and target configuration used for each session
+    -   Audio/visual settings and extension behavior settings
+    -   Separate tracking of played gameMode vs configured gameMode
+-   **Hydra Targets Optimizations**:
+    -   Target movement automatically disabled in Hydra mode for better gameplay
+    -   Target timeout (targetTimeExists) automatically set to 0 in Hydra mode
+    -   Maintains exactly 3 targets on screen at all times
+
+### Changed
+
+-   Stats files now contain much more detailed information for better analysis
+-   Game mode selection affects target behavior automatically (movement, timeout, spawn count)
+
+## [0.0.12] - 2025-09-13
+
+### Added
+
+-   Difficulty presets (easy, normal, hard, very hard, custom). Selecting a preset applies balanced game parameter sets (targets, size, movement, speed).
+
+### Changed
+
+-   Safer workspace handling: when `aimy.closeWorkspaceOnGameStart` is enabled, the extension now only closes editors that are not dirty (no unsaved changes). Dirty editors are left open to avoid "Do you want to save changes?" prompts; only the tabs actually closed are restored after the game.
+
+## [0.0.11] - 2025-01-08
+
+### Added
+
+-   Added `aimy.closeWorkspaceOnGameStart` setting to control whether open editors are closed when a game starts. When disabled, the extension will not close editors and will instead return focus to the game if you switch tabs.
+
+## [0.0.10] - 2025-01-06
+
+### Added
+
+-   Enforced configuration limits in the Settings UI and at runtime to prevent out-of-range values:
+    -   idleTimer: 1000–3600000 ms
+    -   targetGoals: 1–100
+    -   targetSpeed: 100–60000 ms
+    -   targetSize: 10–1000 px
+    -   targetTimeExists: 0–60000 ms
+    -   soundVolume: 0–100
+-   Runtime clamping added to extension to silently correct invalid settings edited manually.
+
+## [0.0.8] - 2025-01-06
+
+### Added
+
+-   Game visuals and HUD now match your editor's dark or light theme.
+-   Changed cursor design and color now match your editor's dark or light theme.
+
+## [0.0.7] - 2025-01-06
+
+### Added
+
+-   Changed display name from AimY to AimY - Aim Trainer
+
+## [0.0.6] - 2025-01-06
+
+### Added
+
+-   Added demo images for visualization
+
+## [0.0.5] - 2025-01-06
+
+### Added
+
+-   Added timeout in (`vscode.window.showInformationMessage()`)
 
 ## [0.0.4] - 2025-01-05
 
@@ -30,64 +96,15 @@ All notable changes to AimY will be documented in this file.
 -   "Reset to defaults" setting implemented (`aimy.resetDefaultSettings`)
 -   README and packaging metadata updates (publisher, repository, icon)
 
-## [0.0.5] - 2025-01-06
+## [0.0.1] - 2025-01-05
 
 ### Added
 
--   Added timeout in (`vscode.window.showInformationMessage()`)
-
-## [0.0.6] - 2025-01-06
-
-### Added
-
--   Added demo images for visualization
-
-## [0.0.7] - 2025-01-06
-
-### Added
-
--   Changed display name from AimY to AimY - Aim Trainer
-
-## [0.0.8] - 2025-01-06
-
-### Added
-
--   Game visuals and HUD now match your editor’s dark or light theme.
--   Changed cursor design and color now match your editor's dark or light theme.
-
-## [0.0.10] - 2025-01-06
-
-### Added
-
--   Enforced configuration limits in the Settings UI and at runtime to prevent out-of-range values:
-    -   idleTimer: 1000–3600000 ms
-    -   targetGoals: 1–100
-    -   targetSpeed: 100–60000 ms
-    -   targetSize: 10–1000 px
-    -   targetTimeExists: 0–60000 ms
-    -   soundVolume: 0–100
--   Runtime clamping added to extension to silently correct invalid settings edited manually.
-
-## [0.0.11] - 2025-01-08
-
-### Added
-
--   Added `aimy.closeWorkspaceOnGameStart` setting to control whether open editors are closed when a game starts. When disabled, the extension will not close editors and will instead return focus to the game if you switch tabs.
-
-## [0.0.12] - 2025-09-13
-
-### Added
-
--   Difficulty presets (easy, normal, hard, very hard, custom). Selecting a preset applies balanced game parameter sets (targets, size, movement, speed).
-
-### Changed
-
--   Safer workspace handling: when `aimy.closeWorkspaceOnGameStart` is enabled, the extension now only closes editors that are not dirty (no unsaved changes). Dirty editors are left open to avoid "Do you want to save changes?" prompts; only the tabs actually closed are restored after the game.
-
-### Features
-
--   🎯 Interactive target shooting game
--   ⚙️ Fully customizable game parameters
--   📊 Detailed performance statistics
--   🔄 Automatic workspace management
--   🎮 Manual game trigger command
+-   Initial release of AimY
+-   Automatic idle detection with configurable timer
+-   Fullscreen target practice game
+-   Customizable target behavior (size, movement, count)
+-   Performance tracking with JSON/CSV export
+-   Status bar toggle for quick enable/disable
+-   Complete workspace restoration after games
+-   Comprehensive settings configuration
