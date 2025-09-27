@@ -2,6 +2,22 @@
 
 All notable changes to AimY will be documented in this file.
 
+## [0.0.14] - 2025-09-27
+
+### Changed
+
+-   **Improved Difficulty Presets**: Difficulty presets now work as true presets without modifying user settings
+    -   When selecting Easy/Normal/Hard/Very Hard: Game uses preset values but your configured settings remain unchanged
+    -   When selecting Custom: Game uses your personal configured settings
+    -   Stats tracking now saves the actual values used in the game (preset or custom)
+    -   Settings UI shows your configured values regardless of selected difficulty preset
+
+### Fixed
+
+-   Difficulty presets no longer overwrite user's configured target settings
+-   Stats files now accurately reflect the game parameters that were actually used during play
+-   Switching between presets and back to Custom properly restores user's original settings
+
 ## [0.0.13] - 2025-09-16
 
 ### Added

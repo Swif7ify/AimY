@@ -2,7 +2,7 @@
 	"name": "aimy",
 	"displayName": "AimY - Aim Trainer",
 	"description": "Stop Coding, Start Shooting",
-	"version": "0.0.13",
+	"version": "0.0.12",
 	"engines": {
 		"vscode": "^1.103.0"
 	},
@@ -145,10 +145,10 @@
 				"aimy.statsFormat": {
 					"type": "string",
 					"enum": [
-						"json",
-						"csv"
+						"csv",
+						"json"
 					],
-					"default": "json",
+					"default": "csv",
 					"description": "Format to save stats: 'json' = one file per run, 'csv' = append rows to aimy-stats.csv."
 				},
 				"aimy.statsDirectory": {

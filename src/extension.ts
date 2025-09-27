@@ -14,12 +14,42 @@ export function activate(context: vscode.ExtensionContext) {
 
 	const DIFFICULTY_PRESETS: Record<
 		string,
-		{ targetGoals: number; targetMove: boolean; targetSpeed: number; targetSize: number; targetTimeExists: number }
+		{
+			targetGoals: number;
+			targetMove: boolean;
+			targetSpeed: number;
+			targetSize: number;
+			targetTimeExists: number;
+		}
 	> = {
-		easy: { targetGoals: 10, targetMove: false, targetSpeed: 1000, targetSize: 140, targetTimeExists: 4000 },
-		normal: { targetGoals: 15, targetMove: false, targetSpeed: 1500, targetSize: 100, targetTimeExists: 2000 },
-		hard: { targetGoals: 30, targetMove: true, targetSpeed: 6000, targetSize: 70, targetTimeExists: 1000 },
-		very_hard: { targetGoals: 50, targetMove: true, targetSpeed: 8000, targetSize: 50, targetTimeExists: 800 },
+		easy: {
+			targetGoals: 10,
+			targetMove: false,
+			targetSpeed: 1000,
+			targetSize: 140,
+			targetTimeExists: 4000,
+		},
+		normal: {
+			targetGoals: 15,
+			targetMove: false,
+			targetSpeed: 1500,
+			targetSize: 100,
+			targetTimeExists: 2000,
+		},
+		hard: {
+			targetGoals: 30,
+			targetMove: true,
+			targetSpeed: 6000,
+			targetSize: 70,
+			targetTimeExists: 1000,
+		},
+		very_hard: {
+			targetGoals: 50,
+			targetMove: true,
+			targetSpeed: 8000,
+			targetSize: 50,
+			targetTimeExists: 800,
+		},
 		custom: {
 			targetGoals: cfg.get<number>("targetGoals", 5),
 			targetMove: cfg.get<boolean>("targetMove", false),
@@ -33,10 +63,24 @@ export function activate(context: vscode.ExtensionContext) {
 		.toLowerCase()
 		.replace(/\s+/g, "_")
 		.replace(/-+/g, "_");
-	let timeFrenzyDuration = clamp(cfg.get<number>("timeFrenzyDuration", 60000), 1000, 3600000);
-	let hydraTargetCount = clamp(cfg.get<number>("hydraTargetCount", 20), 1, 1000);
-	let hydraTotalTime = clamp(cfg.get<number>("hydraTotalTime", 60000), 1000, 3600000);
-	let hydraMode = (cfg.get<string>("hydraMode", "Target Count") || "Target Count")
+	let timeFrenzyDuration = clamp(
+		cfg.get<number>("timeFrenzyDuration", 60000),
+		1000,
+		3600000
+	);
+	let hydraTargetCount = clamp(
+		cfg.get<number>("hydraTargetCount", 20),
+		1,
+		1000
+	);
+	let hydraTotalTime = clamp(
+		cfg.get<number>("hydraTotalTime", 60000),
+		1000,
+		3600000
+	);
+	let hydraMode = (
+		cfg.get<string>("hydraMode", "Target Count") || "Target Count"
+	)
 		.toLowerCase()
 		.replace(/\s+/g, "_")
 		.replace(/-+/g, "_");
@@ -45,7 +89,10 @@ export function activate(context: vscode.ExtensionContext) {
 	let soundVolume = clamp(cfg.get<number>("soundVolume", 80), 0, 100);
 	let enableStatsSave = cfg.get<boolean>("enableStatsSave", true);
 	let enableEffects = cfg.get<boolean>("enableEffects", true);
-	let closeWorkspaceOnGameStart = cfg.get<boolean>("closeWorkspaceOnGameStart", true);
+	let closeWorkspaceOnGameStart = cfg.get<boolean>(
+		"closeWorkspaceOnGameStart",
+		true
+	);
 
 	if (!enableExtension) {
 		vscode.window.withProgress(
@@ -68,51 +115,48 @@ export function activate(context: vscode.ExtensionContext) {
 	let targetMove = cfg.get<boolean>("targetMove", false);
 	let targetSpeed = clamp(cfg.get<number>("targetSpeed", 3000), 100, 60000); // ms
 	let targetSize = clamp(cfg.get<number>("targetSize", 100), 10, 1000); // px
-	let targetTimeExists = clamp(cfg.get<number>("targetTimeExists", 3000), 0, 60000); // ms
+	let targetTimeExists = clamp(
+		cfg.get<number>("targetTimeExists", 3000),
+		0,
+		60000
+	); // ms
 
 	let prevDifficulty = difficulty;
 
 	async function applyDifficulty() {
-		difficulty = (vscode.workspace.getConfiguration("aimy").get<string>("difficulty", "Normal") || "Normal")
+		difficulty = (
+			vscode.workspace
+				.getConfiguration("aimy")
+				.get<string>("difficulty", "Normal") || "Normal"
+		)
 			.toLowerCase()
 			.replace(/\s+/g, "_")
 			.replace(/-+/g, "_");
 
-		const preset = DIFFICULTY_PRESETS[difficulty] || DIFFICULTY_PRESETS.normal;
+		const preset =
+			DIFFICULTY_PRESETS[difficulty] || DIFFICULTY_PRESETS.normal;
 
-		if (difficulty === "Custom") {
+		if (difficulty === "custom") {
 			const cfgNow = vscode.workspace.getConfiguration("aimy");
-			targetGoals = clamp(cfgNow.get<number>("targetGoals", preset.targetGoals), 1, 1000);
-			targetMove = cfgNow.get<boolean>("targetMove", preset.targetMove);
-			targetSpeed = clamp(cfgNow.get<number>("targetSpeed", preset.targetSpeed), 100, 60000);
-			targetSize = clamp(cfgNow.get<number>("targetSize", preset.targetSize), 10, 1000);
-			targetTimeExists = clamp(cfgNow.get<number>("targetTimeExists", preset.targetTimeExists), 0, 60000);
+			targetGoals = clamp(cfgNow.get<number>("targetGoals", 5), 1, 1000);
+			targetMove = cfgNow.get<boolean>("targetMove", false);
+			targetSpeed = clamp(
+				cfgNow.get<number>("targetSpeed", 3000),
+				100,
+				60000
+			);
+			targetSize = clamp(cfgNow.get<number>("targetSize", 100), 10, 1000);
+			targetTimeExists = clamp(
+				cfgNow.get<number>("targetTimeExists", 3000),
+				0,
+				60000
+			);
 		} else {
-			// override with preset (in-memory)
 			targetGoals = clamp(preset.targetGoals, 1, 1000);
 			targetMove = preset.targetMove;
 			targetSpeed = clamp(preset.targetSpeed, 100, 60000);
 			targetSize = clamp(preset.targetSize, 10, 1000);
 			targetTimeExists = clamp(preset.targetTimeExists, 0, 60000);
-
-			if (prevDifficulty !== difficulty) {
-				const conf = vscode.workspace.getConfiguration("aimy");
-				if (conf.get<number>("targetGoals") !== preset.targetGoals) {
-					await conf.update("targetGoals", preset.targetGoals, vscode.ConfigurationTarget.Global);
-				}
-				if (conf.get<boolean>("targetMove") !== preset.targetMove) {
-					await conf.update("targetMove", preset.targetMove, vscode.ConfigurationTarget.Global);
-				}
-				if (conf.get<number>("targetSpeed") !== preset.targetSpeed) {
-					await conf.update("targetSpeed", preset.targetSpeed, vscode.ConfigurationTarget.Global);
-				}
-				if (conf.get<number>("targetSize") !== preset.targetSize) {
-					await conf.update("targetSize", preset.targetSize, vscode.ConfigurationTarget.Global);
-				}
-				if (conf.get<number>("targetTimeExists") !== preset.targetTimeExists) {
-					await conf.update("targetTimeExists", preset.targetTimeExists, vscode.ConfigurationTarget.Global);
-				}
-			}
 		}
 
 		prevDifficulty = difficulty;
@@ -121,7 +165,9 @@ export function activate(context: vscode.ExtensionContext) {
 	void applyDifficulty();
 
 	let idleTimer: NodeJS.Timeout | undefined;
-	const changeDisposable = vscode.workspace.onDidChangeTextDocument(() => resetTimer());
+	const changeDisposable = vscode.workspace.onDidChangeTextDocument(() =>
+		resetTimer()
+	);
 	const selDisposable = vscode.window.onDidChangeTextEditorSelection(() => {
 		resetTimer();
 	});
@@ -138,27 +184,49 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 		const newCfg = vscode.workspace.getConfiguration("aimy");
 		enableExtension = newCfg.get<boolean>("enableExtension", true);
+
+		// Apply difficulty first, then update other settings
 		applyDifficulty();
-		idleDelay = clamp(newCfg.get<number>("idleTimer", 60000), 1000, 3600000);
-		targetGoals = clamp(newCfg.get<number>("targetGoals", 5), 1, 100);
-		targetMove = newCfg.get<boolean>("targetMove", false);
-		targetSpeed = clamp(newCfg.get<number>("targetSpeed", 3000), 100, 60000);
-		targetSize = clamp(newCfg.get<number>("targetSize", 100), 10, 1000);
-		targetTimeExists = clamp(newCfg.get<number>("targetTimeExists", 3000), 0, 60000);
+
+		idleDelay = clamp(
+			newCfg.get<number>("idleTimer", 60000),
+			1000,
+			3600000
+		);
+
 		enableSoundEffects = newCfg.get<boolean>("enableSoundEffects", true);
 		soundVolume = clamp(newCfg.get<number>("soundVolume", 80), 0, 100);
 		enableStatsSave = newCfg.get<boolean>("enableStatsSave", true);
 		enableEffects = newCfg.get<boolean>("enableEffects", true);
-		closeWorkspaceOnGameStart = newCfg.get<boolean>("closeWorkspaceOnGameStart", true);
+		closeWorkspaceOnGameStart = newCfg.get<boolean>(
+			"closeWorkspaceOnGameStart",
+			true
+		);
 
-		gameMode = (newCfg.get<string>("gameMode", "Target_Rush") || "Target_Rush")
+		gameMode = (
+			newCfg.get<string>("gameMode", "Target_Rush") || "Target_Rush"
+		)
 			.toLowerCase()
 			.replace(/\s+/g, "_")
 			.replace(/-+/g, "_");
-		timeFrenzyDuration = clamp(newCfg.get<number>("timeFrenzyDuration", 60000), 1000, 3600000);
-		hydraTargetCount = clamp(newCfg.get<number>("hydraTargetCount", 20), 1, 1000);
-		hydraTotalTime = clamp(newCfg.get<number>("hydraTotalTime", 60000), 1000, 3600000);
-		hydraMode = (newCfg.get<string>("hydraMode", "Target Count") || "Target Count")
+		timeFrenzyDuration = clamp(
+			newCfg.get<number>("timeFrenzyDuration", 60000),
+			1000,
+			3600000
+		);
+		hydraTargetCount = clamp(
+			newCfg.get<number>("hydraTargetCount", 20),
+			1,
+			1000
+		);
+		hydraTotalTime = clamp(
+			newCfg.get<number>("hydraTotalTime", 60000),
+			1000,
+			3600000
+		);
+		hydraMode = (
+			newCfg.get<string>("hydraMode", "Target Count") || "Target Count"
+		)
 			.toLowerCase()
 			.replace(/\s+/g, "_")
 			.replace(/-+/g, "_");
@@ -166,7 +234,10 @@ export function activate(context: vscode.ExtensionContext) {
 	});
 	context.subscriptions.push(configDisposable);
 
-	const status = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
+	const status = vscode.window.createStatusBarItem(
+		vscode.StatusBarAlignment.Right,
+		100
+	);
 	status.command = "aimy.toggle";
 	context.subscriptions.push(status);
 
@@ -176,14 +247,21 @@ export function activate(context: vscode.ExtensionContext) {
 	}
 	updateStatus();
 
-	const toggleDisposable = vscode.commands.registerCommand("aimy.toggle", async () => {
-		enableExtension = !enableExtension;
-		await vscode.workspace
-			.getConfiguration("aimy")
-			.update("enableExtension", enableExtension, vscode.ConfigurationTarget.Global);
-		updateStatus();
-		resetTimer();
-	});
+	const toggleDisposable = vscode.commands.registerCommand(
+		"aimy.toggle",
+		async () => {
+			enableExtension = !enableExtension;
+			await vscode.workspace
+				.getConfiguration("aimy")
+				.update(
+					"enableExtension",
+					enableExtension,
+					vscode.ConfigurationTarget.Global
+				);
+			updateStatus();
+			resetTimer();
+		}
+	);
 	context.subscriptions.push(toggleDisposable);
 
 	let gameActive = false;
@@ -199,7 +277,9 @@ export function activate(context: vscode.ExtensionContext) {
 				return false;
 			}
 			const uri: vscode.Uri = input.uri;
-			const doc = vscode.workspace.textDocuments.find((d) => d.uri.toString() === uri.toString());
+			const doc = vscode.workspace.textDocuments.find(
+				(d) => d.uri.toString() === uri.toString()
+			);
 			return !!(doc && doc.isDirty);
 		} catch {
 			return false;
@@ -250,7 +330,9 @@ export function activate(context: vscode.ExtensionContext) {
 
 		if (closeWorkspaceOnGameStart) {
 			// Save currently open tabs
-			const allTabs = vscode.window.tabGroups.all.flatMap((group) => group.tabs);
+			const allTabs = vscode.window.tabGroups.all.flatMap(
+				(group) => group.tabs
+			);
 
 			const tabsToClose = allTabs.filter((t) => {
 				const input = t.input as any;
@@ -266,24 +348,34 @@ export function activate(context: vscode.ExtensionContext) {
 				try {
 					if (
 						(vscode.window as any).tabGroups &&
-						typeof (vscode.window as any).tabGroups.close === "function"
+						typeof (vscode.window as any).tabGroups.close ===
+							"function"
 					) {
 						await (vscode.window as any).tabGroups.close(tab);
 					} else {
 						const input = tab.input as any;
 						if (input && input.uri) {
-							await vscode.window.showTextDocument(input.uri, { preview: false });
-							await vscode.commands.executeCommand("workbench.action.closeActiveEditor");
+							await vscode.window.showTextDocument(input.uri, {
+								preview: false,
+							});
+							await vscode.commands.executeCommand(
+								"workbench.action.closeActiveEditor"
+							);
 						}
 					}
 				} catch (err) {}
 			}
 		}
 
-		gamePanel = vscode.window.createWebviewPanel("aimyGame", "AimY - Hit the Targets!", vscode.ViewColumn.One, {
-			enableScripts: true,
-			retainContextWhenHidden: true,
-		});
+		gamePanel = vscode.window.createWebviewPanel(
+			"aimyGame",
+			"AimY - Hit the Targets!",
+			vscode.ViewColumn.One,
+			{
+				enableScripts: true,
+				retainContextWhenHidden: true,
+			}
+		);
 
 		gamePanel.onDidDispose(
 			() => {
@@ -299,28 +391,37 @@ export function activate(context: vscode.ExtensionContext) {
 		);
 
 		const editorCfg = vscode.workspace.getConfiguration("editor");
-		const fontFamily = (editorCfg.get<string>("fontFamily") || "").toString();
+		const fontFamily = (
+			editorCfg.get<string>("fontFamily") || ""
+		).toString();
 
 		if (closeWorkspaceOnGameStart && gameActive) {
 			// Prevent new tabs from opening while game is active
-			openTabsDisposable = vscode.window.onDidChangeActiveTextEditor(() => {
-				if (gameActive && vscode.window.activeTextEditor) {
-					vscode.commands.executeCommand("workbench.action.closeActiveEditor");
-					vscode.window.withProgress(
-						{
-							location: vscode.ProgressLocation.Notification,
-							title: "Complete the game to unlock editing!",
-							cancellable: false,
-						},
-						async () => {
-							await new Promise((res) => setTimeout(res, 3000));
-						}
-					);
+			openTabsDisposable = vscode.window.onDidChangeActiveTextEditor(
+				() => {
+					if (gameActive && vscode.window.activeTextEditor) {
+						vscode.commands.executeCommand(
+							"workbench.action.closeActiveEditor"
+						);
+						vscode.window.withProgress(
+							{
+								location: vscode.ProgressLocation.Notification,
+								title: "Complete the game to unlock editing!",
+								cancellable: false,
+							},
+							async () => {
+								await new Promise((res) =>
+									setTimeout(res, 3000)
+								);
+							}
+						);
+					}
 				}
-			});
+			);
 		}
 
-		const isLightTheme = vscode.window.activeColorTheme.kind === vscode.ColorThemeKind.Light;
+		const isLightTheme =
+			vscode.window.activeColorTheme.kind === vscode.ColorThemeKind.Light;
 
 		gamePanel.webview.html = getGameHTML({
 			fontFamily,
@@ -349,17 +450,47 @@ export function activate(context: vscode.ExtensionContext) {
 				if (message.command === "gameComplete") {
 					try {
 						if (enableStatsSave) {
-							await saveGameStats(context, {
-								score: message.score,
-								time: message.time,
-								accuracy: message.accuracy,
-								bestStreak: message.bestStreak,
-								gameMode: message.gameMode,
-								timestamp: new Date().toISOString(),
-							});
+							await saveGameStats(
+								context,
+								{
+									score: message.score,
+									time: message.time,
+									accuracy: message.accuracy,
+									bestStreak: message.bestStreak,
+									gameMode: message.gameMode,
+									timestamp: new Date().toISOString(),
+								},
+								{
+									difficulty: difficulty,
+									targetGoals: targetGoals,
+									targetMove: targetMove,
+									targetSpeed: targetSpeed,
+									targetSize: targetSize,
+									targetTimeExists: targetTimeExists,
+									gameMode: gameMode,
+									timeFrenzyDuration: timeFrenzyDuration,
+									hydraMode: hydraMode,
+									hydraTargetCount: hydraTargetCount,
+									hydraTotalTime: hydraTotalTime,
+									enableSoundEffects: enableSoundEffects,
+									soundVolume: soundVolume,
+									enableEffects: enableEffects,
+								}
+							);
 						}
 					} catch (err) {
-						console.error("Failed saving stats:", err);
+						vscode.window.withProgress(
+							{
+								location: vscode.ProgressLocation.Notification,
+								title: "Failed to save game stats.",
+								cancellable: false,
+							},
+							async () => {
+								await new Promise((res) =>
+									setTimeout(res, 3000)
+								);
+							}
+						);
 					}
 
 					suppressReopen = true;
@@ -408,11 +539,24 @@ export function activate(context: vscode.ExtensionContext) {
 							tab.input !== null &&
 							(tab.input as any).uri
 						) {
-							vscode.window.showTextDocument((tab.input as any).uri, { preview: false });
+							vscode.window.showTextDocument(
+								(tab.input as any).uri,
+								{ preview: false }
+							);
 						}
 					} catch (err) {
-						// ignore restore errors
-						console.error("AimY: failed to restore tab", err);
+						vscode.window.withProgress(
+							{
+								location: vscode.ProgressLocation.Notification,
+								title: "Failed to reopen a tab.",
+								cancellable: false,
+							},
+							async () => {
+								await new Promise((res) =>
+									setTimeout(res, 3000)
+								);
+							}
+						);
 					}
 				});
 				savedTabs = [];
