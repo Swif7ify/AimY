@@ -15,7 +15,7 @@ export function getGameHTML(opts?: {
 	hydraTotalTime?: number;
 	hydraMode?: string;
 }): string {
-	const GAME_MODE = opts?.gameMode || "target_rush"; // normalized: target_rush, time_frenzy, hydra_targets
+	const GAME_MODE = opts?.gameMode || "target_rush"; 
 	const ff = (opts?.fontFamily || "Segoe UI").replace(/["`]/g, "");
 	const IS_LIGHT = !!opts?.isLight;
 	const TARGET_GOALS = opts?.targetGoals ?? 5;
@@ -30,7 +30,7 @@ export function getGameHTML(opts?: {
 	const TIME_FRENZY_DURATION = opts?.timeFrenzyDuration ?? 60000;
 	const HYDRA_TARGET_COUNT = opts?.hydraTargetCount ?? 20;
 	const HYDRA_TOTAL_TIME = opts?.hydraTotalTime ?? 60000;
-	const HYDRA_MODE = opts?.hydraMode || "target_count"; // normalized: target_count, timed
+	const HYDRA_MODE = opts?.hydraMode || "target_count"; 
 
 	// theme-aware colors for HUD and effects
 	const TARGET_WHITE = IS_LIGHT ? "#111111" : "#ffffff";
@@ -242,7 +242,6 @@ export function getGameHTML(opts?: {
             osc.stop(now + 0.20);
         }
 
-        // Add to the webview JavaScript section - replace the existing game logic
         let score = 0;
         let shots = 0;
         let streak = 0;
@@ -274,7 +273,6 @@ export function getGameHTML(opts?: {
                 document.getElementById('targetTotal').textContent = gameTargetLimit;
             }
         } else {
-            // target_rush - default behavior
             document.getElementById('targetTotal').textContent = targetCount;
         }
 
@@ -406,12 +404,10 @@ export function getGameHTML(opts?: {
 
         function initializeGame() {
             if (GAME_MODE === "hydra_targets") {
-                // Create 3 targets for hydra mode
                 for (let i = 0; i < 3; i++) {
                     setTimeout(() => createTarget(), i * 200);
                 }
             } else {
-                // Single target for other modes
                 createTarget();
             }
         }
@@ -441,7 +437,7 @@ export function getGameHTML(opts?: {
                         break;
                     }
                 }
-                if (bestHit.hit) break; // Take first hit
+                if (bestHit.hit) break;
             }
             
             return bestHit;
@@ -462,7 +458,6 @@ export function getGameHTML(opts?: {
                 if (ENABLE_EFFECTS) spawnHitEffect(e.clientX, e.clientY, points);
                 if (SOUND_EFFECTS) playHitSound();
                 
-                // Remove hit target
                 const targetIndex = currentTargets.findIndex(t => t.userData.id === hitResult.target.userData.id);
                 if (targetIndex !== -1) {
                     scene.remove(hitResult.target);

@@ -217,6 +217,7 @@ export async function saveGameStats(
 			);
 			return csvPath;
 		} else {
+			// JSON format includes all settings in the settings object
 			const out = Object.assign({}, stats, { settings: settingsObj });
 			const name = `aimy-stats-${new Date()
 				.toISOString()
