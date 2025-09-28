@@ -2,7 +2,7 @@
 
 All notable changes to AimY will be documented in this file.
 
-## [0.0.15] - 2025-09-28
+## [0.1.0] - 2025-09-28
 
 ### Added
 
