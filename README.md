@@ -35,7 +35,7 @@ Takes over VS Code when you've been idle, forcing you to take an active break be
 Choose between classic 2D target practice or immersive 3D aim training:
 
 -   **2D Mode**: Classic flat targets with particle effects and animations
--   **3D Mode**: Immersive 3D environment with target boards and spatial aiming
+-   **3D Mode**: Immersive 3D environment with target boards and spatial aiming (Experimental)
 
 ### ⚙️ Fully Customizable
 
@@ -143,7 +143,7 @@ Choose `aimy.difficulty` to quickly switch sets of parameters:
 ### Visual Mode Details
 
 -   **2D Mode**: Classic flat target practice with particle effects and animations
--   **3D Mode**: Immersive aim training experience featuring:
+-   **3D Mode**: Immersive aim training experience featuring: (Experimental)
     -   3D environment with target boards
     -   Spatial depth and distance judgment
     -   FPS-style aiming with pointer lock controls

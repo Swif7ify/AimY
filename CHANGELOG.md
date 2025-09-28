@@ -6,7 +6,7 @@ All notable changes to AimY will be documented in this file.
 
 ### Added
 
--   **3D Game Mode**: Completely new immersive 3D aiming experience
+-   **3D Game Mode**: Completely new immersive 3D aiming experience (Experimental)
     -   Full 3D environment with target boards and spatial depth
     -   FPS-style pointer lock controls for authentic aiming
     -   Optimized 3D rendering with Three.js for smooth performance
