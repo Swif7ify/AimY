@@ -1,5 +1,6 @@
 import * as vscode from "vscode";
 import { getGameHTML } from "./gameHtml";
+import { getGameHTML3D } from "./gameHtml3D";
 import { saveGameStats } from "./saveGameStats";
 
 export function activate(context: vscode.ExtensionContext) {
@@ -93,6 +94,7 @@ export function activate(context: vscode.ExtensionContext) {
 		"closeWorkspaceOnGameStart",
 		true
 	);
+	let use3DMode = cfg.get<string>("gameVisualMode", "2D") === "3D";
 
 	if (!enableExtension) {
 		vscode.window.withProgress(
@@ -202,6 +204,7 @@ export function activate(context: vscode.ExtensionContext) {
 			"closeWorkspaceOnGameStart",
 			true
 		);
+		use3DMode = newCfg.get<string>("gameVisualMode", "2D") === "3D";
 
 		gameMode = (
 			newCfg.get<string>("gameMode", "Target_Rush") || "Target_Rush"
@@ -423,23 +426,41 @@ export function activate(context: vscode.ExtensionContext) {
 		const isLightTheme =
 			vscode.window.activeColorTheme.kind === vscode.ColorThemeKind.Light;
 
-		gamePanel.webview.html = getGameHTML({
-			fontFamily,
-			targetGoals,
-			targetMove,
-			targetSpeed,
-			targetSize,
-			targetTimeExists,
-			enableSoundEffects,
-			soundVolume,
-			enableEffects,
-			isLight: isLightTheme,
-			gameMode,
-			timeFrenzyDuration,
-			hydraTargetCount,
-			hydraTotalTime,
-			hydraMode,
-		});
+		gamePanel.webview.html = use3DMode
+			? getGameHTML3D({
+					fontFamily,
+					targetGoals,
+					targetMove,
+					targetSpeed,
+					targetSize,
+					targetTimeExists,
+					enableSoundEffects,
+					soundVolume,
+					enableEffects,
+					isLight: isLightTheme,
+					gameMode,
+					timeFrenzyDuration,
+					hydraTargetCount,
+					hydraTotalTime,
+					hydraMode,
+			  })
+			: getGameHTML({
+					fontFamily,
+					targetGoals,
+					targetMove,
+					targetSpeed,
+					targetSize,
+					targetTimeExists,
+					enableSoundEffects,
+					soundVolume,
+					enableEffects,
+					isLight: isLightTheme,
+					gameMode,
+					timeFrenzyDuration,
+					hydraTargetCount,
+					hydraTotalTime,
+					hydraMode,
+			  });
 
 		// Handle messages from webview
 		gamePanel.webview.onDidReceiveMessage(

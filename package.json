@@ -28,6 +28,15 @@
 					"default": true,
 					"description": "Enable/disable the AimY extension auto-start behavior."
 				},
+				"aimy.gameVisualMode": {
+					"type": "string",
+					"enum": [
+						"2D",
+						"3D"
+					],
+					"default": "2D",
+					"description": "Choose between 2D (flat targets) or 3D (targets with depth and perspective) aiming modes."
+				},
 				"aimy.idleTimer": {
 					"type": "number",
 					"default": 60000,
