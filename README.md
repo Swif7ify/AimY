@@ -39,8 +39,6 @@ Choose between classic 2D target practice or immersive 3D aim training:
 
 ### ⚙️ Fully Customizable
 
-### ⚙️ Fully Customizable
-
 -   Adjust idle timeout (default: 1 minute)
 -   Set number of targets to hit (default: 5)
 -   Configure target size and behavior
@@ -164,6 +162,9 @@ The side benefit of improved mouse precision is just a bonus!
 </p>
 <p align="center">
   <img width="auto" height="400" alt="image2" src="https://github.com/user-attachments/assets/cd3a45ee-4482-4bb2-8d17-a08286c0b71d" />
+</p>
+<p align="center">
+  <img width="auto" height="400" alt="image2" src="https://github.com/user-attachments/assets/1f26d611-b65b-45ab-93fb-56e20b07f4c3" />
 </p>
 
 ## Stats & Privacy
