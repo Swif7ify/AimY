@@ -30,6 +30,15 @@ AimY is a VS Code extension that turns your idle time into aim training sessions
 
 Takes over VS Code when you've been idle, forcing you to take an active break before continuing to code.
 
+### 🌍 2D & 3D Game Modes
+
+Choose between classic 2D target practice or immersive 3D aim training:
+
+-   **2D Mode**: Classic flat targets with particle effects and animations
+-   **3D Mode**: Immersive 3D environment with target boards and spatial aiming
+
+### ⚙️ Fully Customizable
+
 ### ⚙️ Fully Customizable
 
 -   Adjust idle timeout (default: 1 minute)
@@ -70,6 +79,12 @@ All settings are available in VS Code settings under the "AimY" section:
 | ---------------------- | ------- | -------------------------------------------- |
 | `aimy.enableExtension` | `true`  | Enable/disable automatic game triggering     |
 | `aimy.idleTimer`       | `60000` | Idle time in milliseconds before game starts |
+
+### Visual Settings
+
+| Setting               | Default | Description                                          |
+| --------------------- | ------- | ---------------------------------------------------- |
+| `aimy.gameVisualMode` | `"2D"`  | Game visual mode: `2D` (classic) or `3D` (immersive) |
 
 ### Gameplay Settings
 
@@ -126,6 +141,15 @@ Choose `aimy.difficulty` to quickly switch sets of parameters:
 -   **Hydra Targets**: Face 3 simultaneous targets with two completion modes:
     -   _Target Count_: Hit 20 targets total (configurable) with 3 always on screen
     -   _Timed_: Hit as many as possible in 60 seconds (configurable) with 3 always on screen
+
+### Visual Mode Details
+
+-   **2D Mode**: Classic flat target practice with particle effects and animations
+-   **3D Mode**: Immersive aim training experience featuring:
+    -   3D environment with target boards
+    -   Spatial depth and distance judgment
+    -   FPS-style aiming with pointer lock controls
+    -   Optimized for performance while maintaining visual quality
 
 ## Why AimY?
 

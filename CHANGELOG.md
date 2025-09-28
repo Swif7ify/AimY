@@ -2,6 +2,48 @@
 
 All notable changes to AimY will be documented in this file.
 
+## [0.0.15] - 2025-09-28
+
+### Added
+
+-   **3D Game Mode**: Completely new immersive 3D aiming experience
+    -   Full 3D environment with target boards and spatial depth
+    -   FPS-style pointer lock controls for authentic aiming
+    -   Optimized 3D rendering with Three.js for smooth performance
+    -   Targets spawn on a dedicated target board in front of the player
+    -   3D particle effects and hit detection
+-   **Visual Mode Selection**: New `aimy.gameVisualMode` setting
+    -   Choose between "2D" (classic) or "3D" (immersive) game modes
+    -   Each mode maintains the same gameplay mechanics and features
+    -   Stats tracking works across both visual modes
+-   **Enhanced 3D Features**:
+    -   Target board with proper positioning and boundaries
+    -   Crosshair system optimized for 3D aiming
+    -   Movement controls (WASD) with FPS-style camera
+    -   Optimized lighting and shadow system
+    -   Clean 3D environment without performance overhead
+
+### Improved
+
+-   **Performance Optimizations**: 3D mode includes multiple performance enhancements
+    -   Limited pixel ratio for better frame rates
+    -   Optimized shadow mapping and lighting
+    -   Efficient geometry and material usage
+    -   Reduced polygon counts for smooth gameplay
+-   **Cross-Mode Compatibility**: All existing features work in both 2D and 3D
+    -   All game modes (Target Rush, Time Frenzy, Hydra Targets) supported
+    -   Difficulty presets apply to both visual modes
+    -   Sound effects and visual effects work in 3D
+    -   Stats saving includes visual mode information
+
+### Technical
+
+-   Added Three.js integration for 3D rendering
+-   Implemented PointerLockControls for FPS-style aiming
+-   Created optimized 3D target system with proper hit detection
+-   Added 3D scene management and cleanup
+-   Maintained backward compatibility with existing 2D mode
+
 ## [0.0.14] - 2025-09-27
 
 ### Changed
