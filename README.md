@@ -39,8 +39,6 @@ Choose between classic 2D target practice or immersive 3D aim training:
 
 ### ⚙️ Fully Customizable
 
-### ⚙️ Fully Customizable
-
 -   Adjust idle timeout (default: 1 minute)
 -   Set number of targets to hit (default: 5)
 -   Configure target size and behavior
