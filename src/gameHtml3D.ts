@@ -182,7 +182,7 @@ export function getGameHTML3D(opts?: {
             scene.background = new THREE.Color(0x000000); // Black background
             
             const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-            camera.position.set(0, 5, 10);
+            camera.position.set(0, 10, 10);
             
             const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
             renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // Limit for performance
@@ -221,10 +221,10 @@ export function getGameHTML3D(opts?: {
             const borderDepth = 1;
             
             // Target Board - where targets will spawn
-            const boardWidth = 20;
-            const boardHeight = 15;
+            const boardWidth = 30; // Made bigger (was 20)
+            const boardHeight = 20; // Made bigger (was 15)
             const boardDepth = 0.5;
-            const boardDistance = 25; // Distance from player
+            const boardDistance = 15; // Closer (was 25)
             
             const boardGeometry = new THREE.BoxGeometry(boardWidth, boardHeight, boardDepth);
             const boardMaterial = new THREE.MeshLambertMaterial({ 
@@ -243,7 +243,7 @@ export function getGameHTML3D(opts?: {
             
             // Top border
             const topBorder = new THREE.Mesh(
-                new THREE.BoxGeometry(boardWidth + borderThickness*2, borderThickness, borderDepth + 0.1),
+                new THREE.BoxGeometry(boardWidth + borderThickness*2, borderThickness, boardDepth + 0.1),
                 borderMaterial
             );
             topBorder.position.set(0, boardHeight + borderThickness/2, -boardDistance);
@@ -251,7 +251,7 @@ export function getGameHTML3D(opts?: {
             
             // Bottom border
             const bottomBorder = new THREE.Mesh(
-                new THREE.BoxGeometry(boardWidth + borderThickness*2, borderThickness, borderDepth + 0.1),
+                new THREE.BoxGeometry(boardWidth + borderThickness*2, borderThickness, boardDepth + 0.1),
                 borderMaterial
             );
             bottomBorder.position.set(0, -borderThickness/2, -boardDistance);
@@ -259,7 +259,7 @@ export function getGameHTML3D(opts?: {
             
             // Left border
             const leftBorder = new THREE.Mesh(
-                new THREE.BoxGeometry(borderThickness, boardHeight, borderDepth + 0.1),
+                new THREE.BoxGeometry(borderThickness, boardHeight, boardDepth + 0.1),
                 borderMaterial
             );
             leftBorder.position.set(-boardWidth/2 - borderThickness/2, boardHeight/2, -boardDistance);
@@ -267,7 +267,7 @@ export function getGameHTML3D(opts?: {
             
             // Right border
             const rightBorder = new THREE.Mesh(
-                new THREE.BoxGeometry(borderThickness, boardHeight, borderDepth + 0.1),
+                new THREE.BoxGeometry(borderThickness, boardHeight, boardDepth + 0.1),
                 borderMaterial
             );
             rightBorder.position.set(boardWidth/2 + borderThickness/2, boardHeight/2, -boardDistance);
@@ -363,7 +363,7 @@ export function getGameHTML3D(opts?: {
                 osc.stop(now + 0.20);
             }
             
-            // Target creation - spawn only on the target board
+            // Target creation
             function createTarget() {
                 const size = ${DEFAULT_SIZE};
                 
@@ -376,21 +376,22 @@ export function getGameHTML3D(opts?: {
                     const geometry = new THREE.RingGeometry(
                         (i + 1 < radii.length) ? radii[i + 1] : 0, 
                         radii[i], 
-                        16 // Reduced segments for performance
+                        32 // Increased segments for smoother circles
                     );
                     const material = new THREE.MeshBasicMaterial({ 
                         color: colors[i], 
-                        side: THREE.DoubleSide 
+                        side: THREE.DoubleSide,
+                        transparent: false, // Removed transparency
+                        depthWrite: true // Ensure proper depth writing
                     });
                     const ring = new THREE.Mesh(geometry, material);
                     target.add(ring);
                 }
                 
-                // Position targets only on the target board area
                 const boardMargin = 2; // Keep targets away from board edges
                 const x = (Math.random() - 0.5) * (boardWidth - boardMargin*2); // Within board width
                 const y = Math.random() * (boardHeight - boardMargin*2) + boardMargin; // Within board height
-                const z = -boardDistance + boardDepth/2 + 0.1; // Slightly in front of the board
+                const z = -boardDistance + boardDepth/2 + 1.0;
                 
                 target.position.set(x, y, z);
                 
